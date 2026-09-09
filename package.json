@@ -1,0 +1,46 @@
+{
+  "name": "@mnemosyne-plugins/mnemo-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "3D anatomy explorer wired to Mnemosyne memory. Ports ashemag/human-atlas (MIT) onto the cartridge shell; anatomy data is BodyParts3D 4.0 (CC BY 4.0).",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "dev:cartridge": "vite",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.7.0",
+    "@mnemosyne_os/cartridge-sdk": "workspace:*",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.31.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "3.6.0",
+    "three": "^0.159.0",
+    "tw-animate-css": "1.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.159.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "4.2.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1",
+    "vitest": "^1.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mnemosyne-OS/MnemoAtlas"
+  }
+}
