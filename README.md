@@ -4,6 +4,8 @@ An interactive 3D atlas of the human body, running inside [Mnemosyne OS](https:/
 
 Two bodies, 2,234 individually selectable meshes and 3,432 named anatomical structures. Toggle fifteen systems, isolate a single structure, or explode the whole body into its parts. Then revise what you are looking at, and ask what your own notes already say about it.
 
+<img src="./docs/screenshots/body-exploded.png" alt="The male body exploded at 37 percent: skeleton, musculature and the arterial and venous trees pulled apart into three standing figures, with the systems panel on the left" width="900">
+
 ## This is a port, and the viewer is not ours
 
 The 3D viewer is **[Human Atlas](https://github.com/ashemag/human-atlas) by Ashe Magalhaes**, released under MIT. The scene, the geometry batching, the exploded layout, the search and the styling are all upstream's work. [`NOTICE.md`](./NOTICE.md) lists every change we made and why, including the two upstream bugs we had to fix to ship it.
@@ -15,6 +17,10 @@ The anatomy is two datasets, and their attribution is a licence condition, not a
 > Kristen Browne; Heidi Schlehlein. 2023. *3D Reference Organ Set for Female, v1.5.* [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 Both are shown in the app's *Source & credits* panel, whichever body is on screen, because the cartridge distributes both. Do not remove them.
+
+<img src="./docs/screenshots/body-female.png" alt="The female body with its systems panel: 888 meshes, credited to HuBMAP HRA in the header" width="900">
+
+The two bodies are two different datasets, and the header says which one you are looking at. They are not comparable in depth: the male reference is a whole-body model at 2,234 meshes, the female one is an organ set at 888. What that costs is written out below.
 
 ## What the cartridge adds
 
