@@ -26,6 +26,14 @@ If your memory holds nothing about that structure, the panel says so in those wo
 
 **Revision.** One level per organ system, derived from the atlas that is actually loaded, so the counts on the tiles are the counts that will be asked. Runs of 5, 10, 50 or endless, with a Leitner schedule filed against the FMA id rather than against a name. A run is written to the cartridge's own vault as a single chronicle, and only when you press save.
 
+<img src="./docs/screenshots/revision-question.png" alt="A question in a revision run: one structure is highlighted in the 3D body, four names are offered, the chosen wrong answer is marked in red and the right one in green" width="840">
+
+A question highlights one structure in the body and offers four names from the same system, so a wrong answer is wrong for an anatomical reason and not because the other options were obviously absurd. *La regarder* moves the camera onto the structure instead of telling you the answer.
+
+<img src="./docs/screenshots/revision-run-length.png" alt="Choosing a run length for the muscular system: studied, due, mastered and best streak counters, then 5, 10, 50 or endless" width="440">
+
+The four counters are the level's own state, and a streak nobody has set yet renders as a dash rather than as a zero. The line underneath says how many structures the level can actually ask about in the language you are working in.
+
 **Seven interface languages, and structure names in French and Spanish.** The names come from Wikidata and are **not reviewed by anatomists** — the app says so in a notice you have to dismiss once per language, names English as the reference, and tells you how many structures that language actually covers. A question never mixes two languages: the quiz only asks about structures that have a name in the language you are working in.
 
 ## What it does not do
