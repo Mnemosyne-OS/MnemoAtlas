@@ -61,6 +61,7 @@ function keysOf(): Key[] {
     'about.originalGeometry', 'about.publication', 'about.femaleDoi',
     'names.title', 'names.body', 'names.pool', 'names.help', 'names.ok', 'names.loading',
     'level.all',
+    'gest.open', 'gest.title', 'gest.lead', 'gest.asking', 'gest.granted', 'gest.refused', 'gest.speeds', 'gest.speed.orbit', 'gest.speed.depth', 'gest.speed.explode', 'gest.reset', 'gest.loading', 'gest.unsaved', 'gest.inAtlas', 'gest.orbit', 'gest.orbitFlat', 'gest.depth', 'gest.explode', 'gest.recenter', 'gest.select', 'gest.action', 'gest.os', 'gest.osFull', 'gest.osClose', 'gest.osWindow',
   ];
 }
 

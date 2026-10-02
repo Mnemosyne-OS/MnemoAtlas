@@ -30,6 +30,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Brain, Check, ChevronRight, Flame, RotateCcw, Save, Trophy, X } from 'lucide-react';
 import { MnemoCartridgeSDK } from '@mnemosyne_os/cartridge-sdk';
+import { writeKey } from './cartridgeStore';
 import { Button } from '@/components/ui/button';
 import {
   emptyState, grade, nextQuestion, parseState, progress, sessionNote, stateSize, STUDY_SPINE,
@@ -138,7 +139,9 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   const write = (next: ReviewState) => {
     if (store.kind === 'unsaved') { setStore({ ...store, state: next }); return; }
     setStore({ kind: 'ready', state: next });
-    sdk.invoke('state.set', { state: { [KEY]: next } }).catch((err: unknown) => {
+    // Merged, never sent alone: the host replaces the whole blob, and the
+    // gesture settings live in it too (cartridgeStore).
+    writeKey(KEY, next).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn('[atlas] review state not saved:', msg);
       if (alive.current) setStore({ kind: 'unsaved', state: next, why: 'The last answers could not be saved.' });

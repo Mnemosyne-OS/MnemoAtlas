@@ -221,6 +221,33 @@ const en = {
 
   // ── levels ─────────────────────────────────────────────────────────────
   'level.all': 'Whole body',
+
+  // ── gestures (doc 106 §32) ─────────────────────────────────────────────
+  'gest.open': 'Gesture settings',
+  'gest.title': 'Gestures',
+  'gest.lead': 'Put the Atlas in full screen, and your hands drive the body.',
+  'gest.asking': 'Asking Mnemosyne for the gestures…',
+  'gest.granted': 'Gestures on.',
+  'gest.refused': 'Gestures off: {why}',
+  'gest.speeds': 'Speed',
+  'gest.speed.orbit': 'Turn',
+  'gest.speed.depth': 'Zoom',
+  'gest.speed.explode': 'Open the body',
+  'gest.reset': 'Back to 1×',
+  'gest.loading': 'Reading your settings…',
+  'gest.unsaved': 'Applied, but not saved: {why}',
+  'gest.inAtlas': 'In the Atlas',
+  'gest.orbit': 'Pinch and move → turn the body',
+  'gest.orbitFlat': 'Body fully open: pinch and move → slide the view',
+  'gest.depth': 'Pinch, hand toward the camera → come closer',
+  'gest.explode': 'Pinch with both hands, spread them → open the body by stages; bring them together → put it back',
+  'gest.recenter': 'Open hands, held still → frame the body',
+  'gest.select': 'Pinch and hold on a point → open that structure',
+  'gest.action': 'Your « Exploded view » pose → all apart, or all assembled. Teach it in My gestures.',
+  'gest.os': 'Handled by Mnemosyne',
+  'gest.osFull': 'Fingers together, then spread → full screen',
+  'gest.osClose': 'Closed fist, hold → close the window',
+  'gest.osWindow': 'Pinch a window’s corner → move it',
 } as const;
 
 export type Key = keyof typeof en;
@@ -409,6 +436,33 @@ const fr: Dict = {
   "org.trachea": "La voie aérienne principale reliant le larynx aux bronches. Ses anneaux cartilagineux maintiennent le conduit ouvert pendant la respiration.",
   "org.diaphragm": "Un large muscle séparant le thorax de l’abdomen. En se contractant, il augmente le volume thoracique et aide à faire entrer l’air dans les poumons.",
   'level.all': 'Corps entier',
+
+  // ── gestures (doc 106 §32) ─────────────────────────────────────────────
+  'gest.open': 'Réglages des gestes',
+  'gest.title': 'Gestes',
+  'gest.lead': 'Mets l’Atlas en plein écran, et tes mains pilotent le corps.',
+  'gest.asking': 'Demande des gestes à Mnemosyne…',
+  'gest.granted': 'Gestes actifs.',
+  'gest.refused': 'Gestes coupés : {why}',
+  'gest.speeds': 'Vitesse',
+  'gest.speed.orbit': 'Tourner',
+  'gest.speed.depth': 'Zoomer',
+  'gest.speed.explode': 'Éclater le corps',
+  'gest.reset': 'Revenir à 1×',
+  'gest.loading': 'Lecture de tes réglages…',
+  'gest.unsaved': 'Appliqué, mais pas enregistré : {why}',
+  'gest.inAtlas': 'Dans l’Atlas',
+  'gest.orbit': 'Pincer et bouger → tourner le corps',
+  'gest.orbitFlat': 'Corps éclaté à fond : pincer et bouger → faire glisser la vue',
+  'gest.depth': 'Pincer, main vers la caméra → avancer',
+  'gest.explode': 'Pincer à deux mains, les écarter → éclater le corps par niveaux ; les rapprocher → le réassembler',
+  'gest.recenter': 'Mains ouvertes, immobiles → recadrer le corps',
+  'gest.select': 'Pincer et tenir sur un point → ouvrir cette structure',
+  'gest.action': 'Ta pose « Vue éclatée » → tout éclater, ou tout assembler. Apprends-la dans Mes gestes.',
+  'gest.os': 'Pris en charge par Mnemosyne',
+  'gest.osFull': 'Doigts collés, puis écartés → plein écran',
+  'gest.osClose': 'Poing fermé, tenir → fermer la fenêtre',
+  'gest.osWindow': 'Pincer au coin d’une fenêtre → la déplacer',
 };
 
 const es: Dict = {
@@ -594,6 +648,33 @@ const es: Dict = {
   "org.trachea": "La vía aérea principal que une la laringe con los bronquios. Sus anillos de cartílago mantienen el conducto abierto durante la respiración.",
   "org.diaphragm": "Un músculo ancho que separa el tórax del abdomen. Al contraerse aumenta el volumen torácico y ayuda a introducir aire en los pulmones.",
   'level.all': 'Cuerpo entero',
+
+  // ── gestures (doc 106 §32) ─────────────────────────────────────────────
+  'gest.open': 'Ajustes de gestos',
+  'gest.title': 'Gestos',
+  'gest.lead': 'Pon el Atlas en pantalla completa y tus manos controlan el cuerpo.',
+  'gest.asking': 'Pidiendo los gestos a Mnemosyne…',
+  'gest.granted': 'Gestos activos.',
+  'gest.refused': 'Gestos desactivados: {why}',
+  'gest.speeds': 'Velocidad',
+  'gest.speed.orbit': 'Girar',
+  'gest.speed.depth': 'Acercar',
+  'gest.speed.explode': 'Despiezar el cuerpo',
+  'gest.reset': 'Volver a 1×',
+  'gest.loading': 'Leyendo tus ajustes…',
+  'gest.unsaved': 'Aplicado, pero no guardado: {why}',
+  'gest.inAtlas': 'En el Atlas',
+  'gest.orbit': 'Pellizcar y mover → girar el cuerpo',
+  'gest.orbitFlat': 'Cuerpo despiezado del todo: pellizcar y mover → deslizar la vista',
+  'gest.depth': 'Pellizcar, mano hacia la cámara → acercarse',
+  'gest.explode': 'Pellizcar con las dos manos y separarlas → despiezar el cuerpo por niveles; juntarlas → volver a montarlo',
+  'gest.recenter': 'Manos abiertas, quietas → encuadrar el cuerpo',
+  'gest.select': 'Pellizcar y mantener en un punto → abrir esa estructura',
+  'gest.action': 'Tu pose « Vista despiezada » → todo separado o todo montado. Enséñala en Mis gestos.',
+  'gest.os': 'Lo gestiona Mnemosyne',
+  'gest.osFull': 'Dedos juntos, luego separados → pantalla completa',
+  'gest.osClose': 'Puño cerrado, mantener → cerrar la ventana',
+  'gest.osWindow': 'Pellizcar la esquina de una ventana → moverla',
 };
 
 /** de / pt / ru / zh are not written yet: those locales read English. */

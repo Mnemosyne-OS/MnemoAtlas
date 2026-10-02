@@ -8,10 +8,12 @@ import {decodeModelResponse} from './model-download';
 import {assetUrl} from './asset-url';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
-interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void}
-export default function AnatomyScene({atlas,state,onSelect,onProgress,onError}:Props){
- const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect);
- latest.current=state;select.current=onSelect;
+import {EXPLODE_ACTION,dollyDistance,listenToGestures,orbitOffset,panAmount} from './gestures';
+import {getSpeeds} from './gestureSettings';
+interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onAction?:(id:string)=>void;onExplodeBy?:(factor:number)=>void}
+export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onAction,onExplodeBy}:Props){
+ const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),action=useRef(onAction),explodeBy=useRef(onExplodeBy);
+ latest.current=state;select.current=onSelect;action.current=onAction;explodeBy.current=onExplodeBy;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -88,11 +90,47 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError}:P
   const down=(e:PointerEvent)=>{hover.hidden=true;tap.down(e.pointerId,e.clientX,e.clientY,e.pointerType==='touch'?12:5);};
   const move=(e:PointerEvent)=>{tap.move(e.pointerId,e.clientX,e.clientY);if(e.buttons||amount<.5||e.pointerType==='touch'){hover.hidden=true;return;}const rect=el.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top,index=findTarget(x,y,12);hover.hidden=index<0;renderer.domElement.style.cursor=index<0?'grab':'pointer';if(index>=0){hover.textContent=atlas.parts[index].name;hover.style.left=`${Math.max(8,Math.min(x+14,el.clientWidth-260))}px`;hover.style.top=`${Math.max(8,Math.min(y+18,el.clientHeight-55))}px`;}};
   const cancel=(e:PointerEvent)=>tap.cancel(e.pointerId);
-  const up=(e:PointerEvent)=>{
-   const validTap=tap.up(e.pointerId,e.clientX,e.clientY);if(!validTap||!ready)return;const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);
+  // One picking path for a tap and for a hand's « select » (doc 106 §32), so
+  // the two can never disagree on which structure is under the point.
+  const pickAt=(clientX:number,clientY:number,radius:number)=>{
+   if(!ready)return;const rect=renderer.domElement.getBoundingClientRect();if(!rect.width||!rect.height)return;pointer.set((clientX-rect.left)/rect.width*2-1,-(clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);
    let nearest=Infinity,found=-1;const hasSolid=atlas.parts.some((p,i)=>p.system!=='integumentary'&&data[i*4+3]>.5);
    pickers.forEach((mesh,i)=>{if(!mesh||data[i*4+3]<.5||(hasSolid&&atlas.parts[i].system==='integumentary'))return;worldBox.copy(bounds[i]).translate(mesh.position);if(!raycaster.ray.intersectBox(worldBox,hitPoint))return;const hits=raycaster.intersectObject(mesh,false);if(hits[0]&&hits[0].distance<nearest){nearest=hits[0].distance;found=i;}});
-   if(found<0&&amount>.45)found=findTarget(e.clientX-rect.left,e.clientY-rect.top,e.pointerType==='touch'?24:16);if(found>=0){hover.hidden=true;select.current(atlas.parts[found].id);}
+   if(found<0&&amount>.45)found=findTarget(clientX-rect.left,clientY-rect.top,radius);if(found>=0){hover.hidden=true;select.current(atlas.parts[found].id);}
+  };
+  const up=(e:PointerEvent)=>{
+   const validTap=tap.up(e.pointerId,e.clientX,e.clientY);if(!validTap)return;pickAt(e.clientX,e.clientY,e.pointerType==='touch'?24:16);
+  };
+  // The hand (doc 106 §32): the host sends these only while the Atlas is the
+  // full-screen window. Each moves the camera the way the mouse would, and
+  // marks the frame dirty — this loop never repaints an unchanged picture.
+  const offset=new T.Vector3(),right=new T.Vector3(),camUp=new T.Vector3();
+  const stopGestures=listenToGestures({
+   orbit:(g)=>{
+    const k=getSpeeds().orbit,dx=g.dx*k,dy=g.dy*k;
+    if(amount>=.8){
+     // Exploded flat, the mouse pans instead of turning; the hand does too.
+     const move=panAmount(camera.position.distanceTo(controls.target),camera.fov,el.clientHeight,dx,dy);if(!move)return;
+     right.setFromMatrixColumn(camera.matrix,0);camUp.setFromMatrixColumn(camera.matrix,1);
+     const shift=right.multiplyScalar(move.right).add(camUp.multiplyScalar(move.up));camera.position.add(shift);controls.target.add(shift);
+    }else{
+     offset.copy(camera.position).sub(controls.target);
+     const next=orbitOffset(offset,el.clientHeight,dx,dy,controls.maxPolarAngle);if(!next)return;
+     camera.position.copy(controls.target).add(offset.set(next.x,next.y,next.z));
+    }
+    controls.update();dirty=true;
+   },
+   depth:({factor})=>dolly(Math.pow(factor,getSpeeds().depth)),
+   // Both hands opening or closing open or close the body, by stages.
+   zoom:({factor})=>explodeBy.current?.(factor),
+   recenter:()=>{camera.clearViewOffset();lastIsolate='';fit(latest.current.view,amount);},
+   select:({x,y})=>pickAt(x,y,24),
+   action:({id})=>{if(id===EXPLODE_ACTION)action.current?.(id);},
+  });
+  const dolly=(factor:number)=>{
+   offset.copy(camera.position).sub(controls.target);
+   const d=dollyDistance(offset.length(),factor,controls.minDistance,controls.maxDistance);if(d===null)return;
+   camera.position.copy(controls.target).add(offset.setLength(d));controls.update();dirty=true;
   };
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);
   const clock=new T.Clock();let lastExtent=-1;
@@ -129,7 +167,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError}:P
 
   };animate();
   const contextLost=(e:Event)=>{e.preventDefault();onError('The 3D session was paused by your device. Reload to continue.');};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  return()=>{disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();renderer.dispose();renderer.domElement.remove();};
+  return()=>{disposed=true;stopGestures();abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();renderer.dispose();renderer.domElement.remove();};
  },[atlas]);
  return <div className="scene" ref={host}/>;
 }
