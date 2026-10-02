@@ -53,6 +53,7 @@
       }
     ]
   },
+  "repository": "https://github.com/Mnemosyne-OS/MnemoAtlas",
   "updateStrategy": "git",
   "entrypoints": {
     "renderer": "index.html"
