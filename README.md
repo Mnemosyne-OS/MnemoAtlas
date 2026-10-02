@@ -42,6 +42,10 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 
 **Your hands drive the body** (Mnemosyne OS 1.7.0 or later, hand tracking on). Put the Atlas in full screen. Pinch and move to turn the body. Pinch and bring your hand toward the camera to come closer. Pinch with both hands and spread them to open the body by stages, and bring them together to put it back. Hold your open hands still to frame the body again, and pinch and hold on a point to open that structure. You can also teach a pose for « Exploded view » in My gestures: it takes the body all apart, or puts it all back. The hand icon at the top right lists these gestures, says whether Mnemosyne granted them, and sets three speeds: turn, zoom and open. The cartridge never sees the camera or your hand. It receives intentions such as « turn by 12 px ».
 
+<a href="./docs/screenshots/hand-gestures.mp4"><img src="./docs/screenshots/hand-gestures.webp" alt="A hand, tracked by the camera, turns the male body in full screen, then both hands spread and the body opens into separate systems as the explode slider climbs to 48 percent" width="800"></a>
+
+<sub>18 s, recorded in the app. Click for the MP4.</sub>
+
 **Seven interface languages, and structure names in French and Spanish.** The names come from Wikidata and are **not reviewed by anatomists** — the app says so in a notice you have to dismiss once per language, names English as the reference, and tells you how many structures that language actually covers. A question never mixes two languages: the quiz only asks about structures that have a name in the language you are working in.
 
 ## What it does not do
