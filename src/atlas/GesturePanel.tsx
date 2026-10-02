@@ -2,9 +2,11 @@
  * GesturePanel — the sheet that says which hand gestures the Atlas takes,
  * whether the host granted them, and how fast each one moves the body.
  *
- * The gesture lines are the host's own descriptions (shell locale
- * `gestures.hud.app.*`), so the sheet and the shell's cheat-sheet name the
- * same pose the same way.
+ * The gesture lines are the cartridge's own strings, written to match the
+ * host's cheat-sheet (`gestures.hud.app.*`, which an iframe cannot read):
+ * when the host renames a pose, these lines have to follow by hand. The
+ * two-hand line says « open the body », and the manifest's `gestures.labels`
+ * makes the host's cheat-sheet say the same (doc 106 §32.14).
  */
 import {useEffect,useSyncExternalStore} from 'react';
 import {Sheet,SheetContent,SheetTitle,SheetDescription} from '@/components/ui/sheet';

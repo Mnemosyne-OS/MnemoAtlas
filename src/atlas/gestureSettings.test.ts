@@ -58,3 +58,14 @@ describe('changing a speed', () => {
   expect(m.getSaveState()).toEqual({kind:'unsaved',why:'no host'});
  });
 });
+
+describe('back to 1×', () => {
+ it('puts every speed back to 1 and saves it', async () => {
+  const m=await load();
+  await m.loadSpeeds();
+  m.setSpeed('orbit',2.5,{save:false});m.setSpeed('depth',2.5,{save:false});m.setSpeed('explode',2.5,{save:false});
+  m.resetSpeeds();
+  expect(m.getSpeeds()).toEqual({orbit:1,depth:1,explode:1});
+  expect(store.writes.at(-1)).toEqual({orbit:1,depth:1,explode:1});
+ });
+});

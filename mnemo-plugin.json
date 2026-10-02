@@ -1,7 +1,7 @@
 {
   "name": "@mnemosyne-plugins/mnemo-atlas",
   "displayName": "Atlas",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "category": "Research",
   "vendor": "Mnemosyne Labs",
   "license": "MIT",
@@ -51,7 +51,18 @@
           "zh": "爆炸视图"
         }
       }
-    ]
+    ],
+    "labels": {
+      "zoom": {
+        "en": "open the body by stages",
+        "fr": "éclater le corps par niveaux",
+        "es": "despiezar el cuerpo por niveles",
+        "de": "den Körper stufenweise zerlegen",
+        "pt": "abrir o corpo por etapas",
+        "ru": "разобрать тело по уровням",
+        "zh": "逐层拆开身体"
+      }
+    }
   },
   "repository": "https://github.com/Mnemosyne-OS/MnemoAtlas",
   "updateStrategy": "git",
