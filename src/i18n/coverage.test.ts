@@ -43,12 +43,12 @@ function keysOf(): Key[] {
     'sys.nervous', 'sys.respiratory', 'sys.digestive', 'sys.urinary', 'sys.lymphatic',
     'sys.endocrine', 'sys.reproductive', 'sys.integumentary', 'sys.connective', 'sys.pregnancy',
     'org.heart', 'org.liver', 'org.brain', 'org.stomach', 'org.spleen', 'org.pancreas',
-    'org.bladder', 'org.trachea', 'org.diaphragm',
+    'org.bladder', 'org.trachea', 'org.diaphragm', 'org.lungLeft', 'org.lungRight',
     'ui.title', 'ui.find', 'ui.systems', 'ui.all', 'ui.skeletonPreset', 'ui.organsPreset',
     'ui.hideAll', 'ui.visible', 'ui.noMatch', 'ui.explode', 'ui.assembled', 'ui.everyPiece',
     'ui.reset', 'ui.credits', 'ui.preparing', 'ui.loading', 'ui.reload', 'ui.contextNote',
     'ui.atlasRef', 'ui.selectedPieces', 'ui.included', 'ui.andMorePieces', 'ui.viewSource',
-    'ui.isolate', 'ui.showAround', 'ui.clear', 'ui.hintOrbit', 'ui.hintPan', 'ui.hintZoom',
+    'ui.isolate', 'ui.showAround', 'ui.clear', 'ui.hideStructure', 'ui.restoreHidden', 'tour.title', 'tour.open', 'tour.close', 'tour.pick', 'tour.stops', 'tour.prev', 'tour.next', 'tour.exit', 'tour.position', 'tour.name.heart', 'tour.name.respiratory', 'tour.name.digestive', 'tour.name.urinary', 'tour.name.reproductive', 'tour.summary.heart', 'tour.summary.respiratory', 'tour.summary.digestive', 'tour.summary.urinary', 'tour.summary.reproductive', 'org.rightAtrium', 'org.tricuspid', 'org.rightVentricle', 'org.pulmonaryValve', 'org.leftAtrium', 'org.mitral', 'org.leftVentricle', 'org.aorticValve', 'org.bronchus', 'org.lungs', 'org.esophagus', 'org.duodenum', 'org.smallIntestine', 'org.largeIntestine', 'org.cecum', 'org.rectum', 'org.gallbladder', 'org.kidney', 'org.ureter', 'org.urethra', 'org.testis', 'org.epididymis', 'org.deferentDuct', 'org.seminalVesicle', 'org.prostate', 'org.corpusCavernosum', 'org.ovary', 'org.fallopianTube', 'org.uterus', 'org.vagina', 'ui.regions', 'ui.areas', 'ui.wholeBody', 'region.head-neck', 'region.torso', 'region.abdomen', 'region.arm', 'region.pelvis', 'region.legs', 'area.orbit', 'area.willis', 'area.brainstem', 'area.larynx', 'area.heart', 'area.lung-root', 'area.porta', 'area.celiac', 'area.kidneys', 'area.brachial-plexus', 'area.axilla', 'area.cubital', 'area.wrist', 'area.hand', 'area.pelvic-viscera', 'area.popliteal', 'area.foot', 'ui.hintOrbit', 'ui.hintPan', 'ui.hintZoom',
     'ui.hintTap', 'ui.searchPlaceholder', 'ui.searchHintEmpty', 'ui.searchHintTyping',
     'ui.piece', 'ui.pieces',
     'a11y.panels', 'a11y.search', 'a11y.about', 'a11y.layers', 'a11y.closeSystems',
@@ -57,7 +57,7 @@ function keysOf(): Key[] {
     'a11y.view', 'a11y.pause', 'a11y.rotate',
     'about.eyebrow', 'about.title', 'about.leadMale', 'about.leadFemale', 'about.headMale',
     'about.headFemale', 'about.bodyMale', 'about.bodyFemale', 'about.incomplete',
-    'about.disclaimer', 'about.source', 'about.femaleRef', 'about.datasetLicense',
+    'about.disclaimer', 'about.source', 'about.femaleRef', 'about.nervesRef', 'about.nervesLicense', 'about.datasetLicense',
     'about.originalGeometry', 'about.publication', 'about.femaleDoi',
     'names.title', 'names.body', 'names.pool', 'names.help', 'names.ok', 'names.loading',
     'level.all',
@@ -95,6 +95,9 @@ describe('language coverage', () => {
         'about.headMale', 'about.headFemale', 'about.source', 'ui.reset',
         'rank.excellent',      // "Excellent" in English, French and Spanish
         'system.muscular',     // "Muscles" in English and French
+        'region.abdomen',      // "Abdomen" in English, French and Spanish
+        'area.larynx',         // "Larynx" in English and French
+        'tour.name.digestive', // "Digestion" in English and French
       ]);
       const gaps = untranslated.filter((k) => !expected.has(k));
       expect(gaps, `${lang} is missing ${gaps.length} keys`).toEqual([]);

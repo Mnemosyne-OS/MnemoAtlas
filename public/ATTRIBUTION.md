@@ -15,6 +15,15 @@ Source OBJ comments mention an older CC BY-SA 2.1 Japan license. The official cu
 
 BodyParts3D represents an adult male reference anatomy based on TARO MRI and anatomical illustration refinements. It is not a complete model of every possible human anatomical structure or variation. This interface is educational and is not a clinical tool.
 
+## Peripheral nerves (Z-Anatomy)
+
+"Z-Anatomy" – CC-BY-SA 4.0. https://www.z-anatomy.com / https://github.com/LluisV/Z-Anatomy
+Derived from Z-Anatomy's human model, itself built on "BodyParts3D" – The Database Center for Life Science – CC-BY 4.0, with reference models "Brainder" and "White matter" – University of Washington, and "Cranial Nerves and Foramina" – University of Dundee, CAHID – CC-BY 4.0. 3D models: Kousaku Okubo, Gauthier Kervyn, Colline Brassard, Christophe Céleste.
+
+- License: https://creativecommons.org/licenses/by-sa/4.0/
+- Adaptation: nerve curves resampled (Catmull-Rom), registered onto the BodyParts3D frame by a bone-landmark similarity solve, converted to tube meshes (Rayzi0417, upstream human-atlas #283). Pipeline in `scripts/peripheral-nerves/`.
+- Share-alike scope: `models/nerves-0.bin.gz` and the 54 `ZN*` entries in `models/atlas.json` are licensed CC BY-SA 4.0. The rest of the atlas is unaffected.
+
 ## Female anatomy
 
 Female reference anatomy, shipped in this cartridge: Kristen Browne and Heidi Schlehlein, Human Reference Atlas / HuBMAP, *3D Reference Organ Set for Female v1.5* (2023). CC BY 4.0. Geometry adapted for this viewer.

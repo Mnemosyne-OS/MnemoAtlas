@@ -36,6 +36,9 @@ describe('translation', () => {
       ['review.notWritten', ['why']],
       ['memory.nothing', ['name']],
       ['memory.failed', ['why']],
+      ['ui.restoreHidden', ['n']],
+      ['tour.stops', ['n']],
+      ['tour.position', ['n', 'total']],
     ];
     for (const lang of LANGS) {
       for (const [key, vars] of withVars) {

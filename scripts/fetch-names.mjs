@@ -26,6 +26,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { borrowFemaleNames } from './borrow-female-names.mjs';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -121,10 +122,17 @@ await harvest('UBERON', uberon, 'P1554', 'UBERON:');
 
 mkdirSync(join(root, 'public/names'), { recursive: true });
 const total = fma.length + uberon.length;
+// Structures Wikidata cannot name (the Z-Anatomy nerves carry no ontology id)
+// are written by hand in curated-names.json and merged over the harvest, so a
+// regeneration never drops them. Keys starting with « _ » are notes.
+const curated = JSON.parse(readFileSync(join(here, 'curated-names.json'), 'utf8'));
 for (const lang of LANGS) {
-  const map = found[lang];
+  const map = { ...found[lang], ...(curated[lang] ?? {}) };
   const sorted = Object.fromEntries(Object.keys(map).sort().map((k) => [k, map[k]]));
   writeFileSync(join(root, 'public/names', `${lang}.json`), `${JSON.stringify(sorted)}\n`);
   const n = Object.keys(map).length;
   console.log(`  ${lang}  ${n} / ${total}  (${((n / total) * 100).toFixed(0)}%)`);
 }
+
+// Female structures that share a male twin's exact English name borrow its label.
+borrowFemaleNames(LANGS);

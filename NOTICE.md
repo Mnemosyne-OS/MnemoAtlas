@@ -1,6 +1,6 @@
 # NOTICE
 
-This cartridge redistributes three works that are not ours. Each line below is a
+This cartridge redistributes four works that are not ours. Each line below is a
 licence condition, not a courtesy.
 
 ## Viewer code — MIT
@@ -72,7 +72,12 @@ before anything can be studied in a translated language, names English as the
 reference, and says how many structures the language actually covers.
 
 Coverage measured on the full corpus, 2026-09-09: **French 1,381 / 3,432**,
-**Spanish 851 / 3,432**.
+**Spanish 851 / 3,432**. Since 2026-10-03 the male corpus is 3,486 concepts and
+the 54 nerve names are added by hand: French 1,435, Spanish 905.
+Female concepts that carry exactly the English name of a male one borrow its
+label (`scripts/borrow-female-names.mjs`, no ambiguous borrow possible): 144 in
+French, 123 in Spanish. The other female names stay English rather than be
+translated by a machine.
 
 The female body is partly covered, which is not obvious and was nearly missed:
 its CONCEPTS are `HRA:VH_F_*` and carry no ontology id at all, but 266 of its
@@ -91,3 +96,69 @@ duplicates, but covers 89 structures of 1,073.
 that have a name in the current language, and the tiles count that pool — so
 the number on screen is the number that will be asked. Regenerate with
 `node scripts/fetch-names.mjs`.
+
+## Peripheral nerves — CC BY-SA 4.0
+
+The 54 peripheral nerves of the male body (sciatic, median, ulnar, radial,
+brachial plexus, trigeminal branches, facial nerve…) come from Z-Anatomy.
+
+> "Z-Anatomy" – CC-BY-SA 4.0. https://www.z-anatomy.com ·
+> https://github.com/LluisV/Z-Anatomy
+
+- Licence: https://creativecommons.org/licenses/by-sa/4.0/
+- Verified at source: the `LICENSE` and README of `LluisV/Z-Anatomy`, and the
+  project's licence document (linked from that `LICENSE`), read 2026-10-03.
+- Z-Anatomy asks that derived human-model content credit, in its own words:
+  "BodyParts3D" – The Database Center for Life Science – CC-BY 4.0;
+  "Z-Anatomy" – CC-BY-SA 4.0; and its reference models: "Brainder" and
+  "White matter" – University of Washington; "Cranial Nerves and Foramina" –
+  University of Dundee, CAHID – CC-BY 4.0. (Its list also names an inner-ear
+  and a kidney reference under non-commercial licences; no inner-ear or kidney
+  geometry is used here, only nerves.)
+- Authors of the 3D models, per the same document: Kousaku Okubo, Gauthier
+  Kervyn, Colline Brassard, Christophe Céleste.
+- Adaptation, by Rayzi0417 in upstream human-atlas #283: nerve curves resampled
+  with Catmull-Rom splines, registered onto the BodyParts3D frame by a
+  similarity solve on six landmark bones, swept into tube meshes. Pipeline in
+  `scripts/peripheral-nerves/` (never run here: it needs Blender and the
+  Z-Anatomy `.blend`).
+
+🚨 **Share-alike scope.** Covered by CC BY-SA 4.0: `public/models/nerves-0.bin.gz`
+AND the 54 `ZN*` part and concept entries in `public/models/atlas.json`. Anyone
+may reuse them, commercially too, as long as they stay under CC BY-SA 4.0.
+Everything else in this cartridge keeps its own licence.
+
+⚠️ Z-Anatomy's licence document adds a reading of its own: "the integration of
+(a part of) the model inside an app made to read it requires sharing the code
+of this app". This cartridge's code is public under MIT
+(https://github.com/Mnemosyne-OS/MnemoAtlas). Whether that reading reaches the
+host application that loads the cartridge is a question for a decision, not
+for this file.
+
+The nerves exist for the male body only. They have no ontology id, so
+Wikidata cannot name them: their French and Spanish names (27 nerves, left and
+right) are written by hand in `scripts/curated-names.json`, which
+`fetch-names.mjs` merges over its output so a regeneration keeps them.
+
+## Fixes drawn from upstream pull requests
+
+These were proposed to Human Atlas and left unmerged there. Each was rewritten
+for this cartridge rather than applied as a patch; the idea and the credit are
+theirs. Upstream contributions are MIT, like the rest of the viewer code.
+
+- #176, Oğuz Gençer (drader): the wheel zooms toward the pointer.
+- #214 and #216, Oğuz Gençer (drader): the camera no longer jumps while the
+  body opens, and gets its view back when it closes.
+- #421, PHPLego (phplego): hide one structure and bring it back.
+- #429, rajasekhar (rajasekharponakala): searching « lung » finds the organ's
+  bronchial and pulmonary pieces.
+- #435, Cocoon-Break (kuishou68): the iliotibial tracts are connective tissue.
+- #283, Rayzi0417: the 54 peripheral nerves (data taken as is, see above).
+- #1, Steven Frohlich (StevenRonnyFrohlich): body regions and study areas.
+- #434 and #234 (Sagar Dixit, Akshat Srivastava) both asked for a dark theme. Not
+  their code: here the atlas follows the app's theme instead of adding its own toggle.
+- #5, Carson Rodrigues (rodriguescarson): guided visits. Their stops, plus the male
+  reproductive tract, the female heart and gut stops, and a camera that frames the organ.
+  The areas here also catch the nerves, and only what a body has is offered.
+
+#174 (the explode slider's missing track) had already been fixed here.
