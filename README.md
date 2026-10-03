@@ -64,6 +64,9 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 
 ## Changes
 
+**0.2.6**
+- Your review progress comes back after you close the Atlas. It was saved, but read back from the wrong place.
+
 **0.2.5**
 - A review question always offers four different names. Some structures share a name, and the same answer could appear twice.
 - Structures without a name are left out of the review.

@@ -22,4 +22,10 @@ describe('the review panel writes through the merging writer', () => {
   it('saves its key with writeKey', () => {
     expect(source).toMatch(/writeKey\(KEY,/);
   });
+  // `state.get` answers an envelope, and only the store takes the blob out of
+  // it: read directly, the schedule was looked up on the envelope and never found.
+  it('never calls state.get on its own, and reads through readStore', () => {
+    expect(source).not.toMatch(/['"]state\.get['"]/);
+    expect(source).toMatch(/readStore\(\)/);
+  });
 });

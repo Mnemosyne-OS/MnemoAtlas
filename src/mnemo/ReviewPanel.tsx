@@ -30,7 +30,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Brain, Check, ChevronRight, Flame, RotateCcw, Save, Trophy, X } from 'lucide-react';
 import { MnemoCartridgeSDK } from '@mnemosyne_os/cartridge-sdk';
-import { writeKey } from './cartridgeStore';
+import { readStore, writeKey } from './cartridgeStore';
 import { Button } from '@/components/ui/button';
 import {
   emptyState, grade, nextQuestion, parseState, progress, sessionNote, stateSize, STUDY_SPINE,
@@ -114,10 +114,12 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   // ── the schedule ─────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    sdk.invoke<Record<string, unknown>>('state.get')
+    // Through the store, never `state.get` directly: the host answers an
+    // envelope, and only the store takes the blob out of it.
+    readStore()
       .then((data) => {
         if (cancelled || !alive.current) return;
-        setStore({ kind: 'ready', state: parseState(data?.[KEY]) });
+        setStore({ kind: 'ready', state: parseState(data[KEY]) });
       })
       .catch((err: unknown) => {
         if (cancelled || !alive.current) return;

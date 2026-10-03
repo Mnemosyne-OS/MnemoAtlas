@@ -15,12 +15,12 @@ const ATLAS_FILE={id:'@mnemosyne-plugins/mnemo-atlas',state:{review:{v:1,cards:{
 // cartridge-state/@mnemosyne-plugins%2fmnemo-molecule.json, 2026-09-09 (317 bytes)
 const MOLECULE_FILE={id:'@mnemosyne-plugins/mnemo-molecule',state:{review:{v:1,cards:{'CHEBI:16235':{b:0,d:20705,n:1},'CHEBI:17568':{b:0,d:20705,n:1},'CHEBI:16750':{b:1,d:20706,n:1},'CHEBI:17821':{b:1,d:20706,n:1},'CHEBI:16708':{b:0,d:20705,n:1}},best:2}},updatedAt:'2026-09-09T18:21:03.967Z'};
 
-/** The host as `state.get` / `state.set` see it: the `state` member, replaced whole. */
-function hostHolding(file:{state:Record<string, unknown>}){
+/** The host as `state.get` / `state.set` see it: the `state` member replaced whole, read back inside its envelope. */
+function hostHolding(file:{state:Record<string, unknown>,updatedAt:string}){
  let blob:Record<string, unknown>=structuredClone(file.state);
  const invoke:Invoke=async<T,>(action:string,payload?:Record<string, unknown>)=>{
   await Promise.resolve();
-  if(action==='state.get')return structuredClone(blob) as T;
+  if(action==='state.get')return {state:structuredClone(blob),updatedAt:file.updatedAt} as T;
   if(action==='state.set'){blob=payload!.state as Record<string, unknown>;return undefined as T;}
   throw new Error(action);
  };
