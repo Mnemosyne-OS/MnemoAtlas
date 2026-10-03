@@ -159,6 +159,11 @@ theirs. Upstream contributions are MIT, like the rest of the viewer code.
   their code: here the atlas follows the app's theme instead of adding its own toggle.
 - #5, Carson Rodrigues (rodriguescarson): guided visits. Their stops, plus the male
   reproductive tract, the female heart and gut stops, and a camera that frames the organ.
+- Issue #430 asked for the three sensory zones of the trigeminal nerve. The zones
+  are not drawn; a visit shows the three branches and each stop names its zone.
+- #236 / #237, CYU (calvinyu94-debug): fascial lines. Not their code or data: four
+  lines rebuilt here as visits from the muscles this atlas has, after Thomas Myers'
+  model, presented as a model that anatomists still debate.
   The areas here also catch the nerves, and only what a body has is offered.
 
 #174 (the explode slider's missing track) had already been fixed here.

@@ -226,6 +226,11 @@ h1 .edition{font-family:inherit;font-weight:500;font-size:10px;letter-spacing:.0
 .tour-item strong{font-size:13px;font-weight:600}.tour-item span{font-size:11px;line-height:1.35;color:var(--hc-687786ff)}
 .tour-bar{display:flex;flex-direction:column;gap:6px;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--hc-18253612)}
 .tour-where{font-size:11px;letter-spacing:.04em;color:var(--hc-687786ff)}.tour-steps{display:flex;gap:4px}.tour-steps button{flex:1;gap:4px}
+/* Ten visits outgrow the screen: the panel stops above the dock and its list scrolls. */
+.tours-panel{display:flex;flex-direction:column;max-height:calc(100dvh - 210px)}.tours-panel .tour-list{flex:1;min-height:0}
+/* A station title is written in sentence case already; structure names are lowercase data. */
+.structure-title.is-station{text-transform:none}
+.tour-group h3{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--hc-687786ff);margin:10px 4px 2px;font-weight:600}.tour-note{font-size:11px;line-height:1.35;color:var(--hc-687786ff);margin:0 4px 4px}
 
 /* ── Colour tokens, and the dark theme ─────────────────────────────────────
    Every colour above is a --hc-* token. Light values are the original

@@ -24,6 +24,38 @@ describe('tourSteps', () => {
   });
 });
 
+describe('nerves and fascial lines', () => {
+  const steps = (a: Atlas, id: string) => tourSteps(a, TOURS.find(t => t.id === id)!);
+  const systemOf = new Map(male.parts.map(p => [p.id, p.system]));
+
+  it('walks the trigeminal nerve trunk, then V1, V2, V3, then all three together', () => {
+    const s = steps(male, 'trigeminal');
+    expect(s.map(c => c.id)).toEqual(['ZNTRIGEMIN-LC', 'ZNOPHTHALM-LC', 'ZNMAXILLAR-LC', 'ZNMANDIBUL-LC', 'station.trigeminal.all']);
+    expect(s[4].elements).toHaveLength(4);
+  });
+
+  it('a station lights every structure it names, on both sides', () => {
+    const hamstrings = steps(male, 'lineBack').find(c => c.id === 'station.lineBack.hamstrings')!;
+    const names = male.parts.filter(p => hamstrings.elements.includes(p.id)).map(p => p.name);
+    for (const n of ['Right semitendinosus', 'Left semitendinosus', 'Right semimembranosus', 'Left semimembranosus']) expect(names).toContain(n);
+  });
+
+  it('a line ends on a stop that lights all of it, and every station is muscle or fascia', () => {
+    for (const id of ['lineBack', 'lineFront', 'lineLateral', 'lineDeep']) {
+      const s = steps(male, id);
+      const last = s[s.length - 1];
+      expect(last.id).toBe(`station.${id}.all`);
+      expect(new Set(last.elements)).toEqual(new Set(s.slice(0, -1).flatMap(c => c.elements)));
+      for (const c of s) expect(c.elements.every(e => ['muscular', 'connective'].includes(systemOf.get(e)!)), `${c.id}`).toBe(true);
+    }
+  });
+
+  it('the female reference has none of these structures, so it is offered none of these visits', () => {
+    const ids = toursFor(female).map(t => t.tour.id);
+    for (const id of ['trigeminal', 'lineBack', 'lineFront', 'lineLateral', 'lineDeep']) expect(ids).not.toContain(id);
+  });
+});
+
 describe('toursFor', () => {
   it('offers every tour in the male body', () => {
     expect(toursFor(male).map(t => t.tour.id)).toEqual(TOURS.map(t => t.id));
