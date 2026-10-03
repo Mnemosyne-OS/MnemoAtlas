@@ -40,7 +40,7 @@ If your memory holds nothing about that structure, the panel says so in those wo
 
 <img src="./docs/screenshots/revision-question.png" alt="A question in a revision run: one structure is highlighted in the 3D body, four names are offered, the chosen wrong answer is marked in red and the right one in green" width="840">
 
-A question highlights one structure in the body and offers four names from the same system, so a wrong answer is wrong for an anatomical reason and not because the other options were obviously absurd. *La regarder* moves the camera onto the structure instead of telling you the answer.
+A question highlights one structure in the body and offers four different names from the same system, so a wrong answer is wrong for an anatomical reason and not because the other options were obviously absurd. *La regarder* moves the camera onto the structure instead of telling you the answer.
 
 <img src="./docs/screenshots/revision-run-length.png" alt="Choosing a run length for the muscular system: studied, due, mastered and best streak counters, then 5, 10, 50 or endless" width="440">
 
@@ -48,7 +48,7 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 
 **Body regions and study areas.** The systems panel offers six regions: head and neck, torso, abdomen, arm and hand, pelvis, legs. Each region frames itself on screen. Inside a region, study areas narrow the view further: the orbit, the circle of Willis, the brachial plexus, the cubital fossa, the porta hepatis, the popliteal fossa, and eleven more. A region filters the systems you have switched on. With only the skeleton on, « Legs » shows the bones of the legs.
 
-**Guided visits.** The path icon at the top right opens the visits. Five follow an organ: the heart, breathing, digestion, the urinary tract and the reproductive tract. A visit walks through an organ stop by stop. Each stop is selected and explained, with Previous and Next in the detail panel. The heart visit follows the blood through the four chambers and the four valves. The same visit adapts to the female body and skips the stops it lacks. A sixth visit follows the trigeminal nerve and its three branches, with the zone of the face each one serves. Four more follow fascial lines, after the model of muscle chains proposed by Thomas Myers, which anatomists still debate. A line lights its muscles station by station, then all at once, and names the links this atlas lacks.
+**Guided visits.** The path icon at the top right opens the visits. Five follow an organ: the heart, breathing, digestion, the urinary tract and the reproductive tract. A visit walks through an organ stop by stop. Each stop is shown on its own, framed and explained, with Previous and Next in the detail panel. « Show surrounding anatomy » brings the rest of the organ back around it. The heart visit follows the blood through the four chambers and the four valves. The same visit adapts to the female body and skips the stops it lacks. A sixth visit follows the trigeminal nerve and its three branches, with the zone of the face each one serves. Four more follow fascial lines, after the model of muscle chains proposed by Thomas Myers, which anatomists still debate. A line lights its muscles station by station, then all at once, and names the links this atlas lacks.
 
 **Hide one structure.** Select a structure and press « Hide this structure » to clear the view around what you are studying. The systems panel offers to bring hidden structures back.
 
@@ -61,6 +61,33 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 <sub>18 s, recorded in the app. Click for the MP4.</sub>
 
 **Seven interface languages, and structure names in French and Spanish.** The names come from Wikidata and are **not reviewed by anatomists**. The app says so in a notice you dismiss once per language, names English as the reference, and tells you how many structures that language covers. The 54 nerves have names written by hand. A female structure borrows the name of the male structure that has exactly the same English name. A question never mixes two languages: the quiz only asks about structures that have a name in the language you are working in.
+
+## Changes
+
+**0.2.5**
+- A review question always offers four different names. Some structures share a name, and the same answer could appear twice.
+- Structures without a name are left out of the review.
+- The language notice counts the structures the body on screen can ask about.
+- Reset, a system, a region or a study area ends a guided visit. Ending a visit brings back the region it started from.
+- Searching « pulmonary valve » finds the valve. A single broad word like « lung » still finds the bronchial and pulmonary pieces.
+- A study area is offered only with 8 pieces or more.
+- Error messages are translated, and loading has a time limit.
+
+**0.2.4**
+- A guided visit of the trigeminal nerve and four fascial lines.
+- Tibialis anterior, tibialis posterior, the three fibularis muscles and tensor fasciae latae are now filed as muscles. They were filed as bone or connective tissue.
+
+**0.2.3**
+- Each stop of a guided visit is shown on its own. The aortic valve sits inside the heart and was hidden by its wall.
+- The caption above the explode slider is translated.
+
+**0.2.2**
+- Body regions and study areas, guided visits, hiding one structure, and the app's dark or light theme.
+- 54 peripheral nerves from Z-Anatomy, with French and Spanish names.
+- 144 female structures in French and 123 in Spanish take the name of the male structure with the same English name.
+- The wheel zooms toward the pointer, and the camera holds still while the body opens.
+- The iliotibial tracts are filed as connective tissue, and the brain's ventricles as nervous system. They were filed as bone and as heart.
+- « View anatomical source » links to the dataset each structure comes from.
 
 ## What it does not do
 
