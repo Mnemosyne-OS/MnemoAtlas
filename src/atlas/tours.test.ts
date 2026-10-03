@@ -73,6 +73,17 @@ describe('tourFrame', () => {
     const frame = tourFrame(tourSteps(male, tour), male, tour.systems);
     const ys = male.parts.filter(p => frame.includes(p.id)).map(p => (p.bounds[0][1] + p.bounds[1][1]) / 2);
     expect(Math.max(...ys) - Math.min(...ys)).toBeLessThan(0.25);
+    // The frame is the stops' selection, never the raw concepts (« heart » owns
+    // muscle and vessel meshes that would widen the frame).
+    expect(frame.every(id => male.parts.find(p => p.id === id)!.system === 'cardiac')).toBe(true);
+  });
+
+  it('a station keeps what the body has and is skipped when it has nothing', () => {
+    const tour = {id: 'lineBack' as const, group: 'line' as const, systems: ['muscular' as const], steps: [
+      {station: 'half', all: ['FMA22357', 'NOPE1']}, {station: 'none', all: ['NOPE2', 'NOPE3']}, ['FMA22438']]};
+    const s = tourSteps(male, tour);
+    expect(s.map(c => c.id)).toEqual(['station.lineBack.half', 'FMA22438']);
+    expect(s[0].elements).toEqual(male.concepts.find(c => c.id === 'FMA22357')!.elements);
   });
 });
 

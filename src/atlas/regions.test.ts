@@ -55,8 +55,22 @@ describe('areas', () => {
     expect(plexus).not.toContain('Left femur');
   });
 
-  it('a toe is never in the hand', () => {
-    expect(atlas.parts.some(p => partInArea(p, 'hand', body) && /toe/i.test(p.name))).toBe(false);
+  it('a hand piece is always in the arm, a foot piece always in the legs', () => {
+    // Without the region guard, « opponens » of the foot and the metacarpal
+    // veins slip across: six real meshes, measured.
+    const hand = atlas.parts.filter(p => partInArea(p, 'hand', body));
+    const foot = atlas.parts.filter(p => partInArea(p, 'foot', body));
+    expect(hand.length).toBeGreaterThan(0);
+    expect(hand.every(p => partRegion(p, body) === 'arm')).toBe(true);
+    expect(foot.every(p => partRegion(p, body) === 'legs')).toBe(true);
+    expect(atlas.parts.filter(p => /\bopponens\b/i.test(p.name) && /\bfoot\b/i.test(p.name)).some(p => partInArea(p, 'hand', body))).toBe(false);
+  });
+
+  it('the female body is offered only real clusters', () => {
+    const female = JSON.parse(readFileSync(resolve(__dirname, '../../public/models/atlas-female.json'), 'utf8')) as Atlas;
+    const fb = bodyBounds(female.parts);
+    for (const a of areasFor(female.parts, fb, null)) expect(female.parts.filter(p => partInArea(p, a, fb)).length, a).toBeGreaterThanOrEqual(8);
+    expect(areasFor(female.parts, fb, null)).not.toContain('brachial-plexus');
   });
 
   it('only offers areas this body has, inside the chosen region', () => {

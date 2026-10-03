@@ -10,6 +10,7 @@ export function atlasTools(atlas:Atlas,inspect:(concept:Concept)=>void):Tool[]{r
 export function registerAtlasTools(atlas:Atlas,inspect:(concept:Concept)=>void){
  const context=(document as Document&{modelContext?:{registerTool:(tool:Tool,options:{signal:AbortSignal})=>void|Promise<void>}}).modelContext;
  if(!context?.registerTool)return;const lifecycle=new AbortController();
- for(const tool of atlasTools(atlas,inspect)){try{void Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{/* Optional browser capability; the visible UI remains available. */}}
+ // Optional browser capability: a refusal leaves the visible UI intact, and says so in the console.
+ for(const tool of atlasTools(atlas,inspect)){try{void Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(e=>console.warn('[atlas] registerTool refused',tool.name,e));}catch(e){console.warn('[atlas] registerTool failed',tool.name,e);}}
  return()=>lifecycle.abort();
 }

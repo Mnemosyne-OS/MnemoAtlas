@@ -143,10 +143,22 @@ function rand(seed: number): () => number {
   };
 }
 
-function pick<T>(xs: T[], n: number, r: () => number): T[] {
+/**
+ * Draws up to `n` options whose NAMES are all different, and different from
+ * every name already in `taken`. Two concepts can share a name (the female
+ * reference has 94 such names, « sigmoid artery » four times), and an option
+ * shown twice is a question where one of two identical answers is wrong.
+ */
+function pickDistinct(xs: Askable[], n: number, r: () => number, taken: Set<string>): Askable[] {
   const pool = xs.slice();
-  const out: T[] = [];
-  while (out.length < n && pool.length) out.push(pool.splice(Math.floor(r() * pool.length), 1)[0]!);
+  const out: Askable[] = [];
+  while (out.length < n && pool.length) {
+    const a = pool.splice(Math.floor(r() * pool.length), 1)[0]!;
+    const key = a.name.trim().toLowerCase();
+    if (taken.has(key)) continue;
+    taken.add(key);
+    out.push(a);
+  }
   return out;
 }
 
@@ -192,8 +204,9 @@ export function nextQuestion(
   const sameSystem = pool.filter((a) => a.id !== subject.id && a.system === subject.system);
   const others = pool.filter((a) => a.id !== subject.id && a.system !== subject.system);
   const want = Math.min(optionCount - 1, pool.length - 1);
-  const distractors = pick(sameSystem, want, r);
-  if (distractors.length < want) distractors.push(...pick(others, want - distractors.length, r));
+  const taken = new Set([subject.name.trim().toLowerCase()]);
+  const distractors = pickDistinct(sameSystem, want, r, taken);
+  if (distractors.length < want) distractors.push(...pickDistinct(others, want - distractors.length, r, taken));
 
   const options = [subject, ...distractors];
   // Shuffle so the answer is not always first.

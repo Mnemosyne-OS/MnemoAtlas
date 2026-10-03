@@ -42,6 +42,8 @@ describe('the pool a level draws from', () => {
     // Five skeletal MESHES, but the femur is one concept across two of them.
     expect(atlas.parts.filter((p) => p.system === 'skeletal')).toHaveLength(5);
     expect(askablePool(atlas, ['skeletal'])).toHaveLength(4);
+    const dashed = { ...atlas, concepts: [...atlas.concepts, { id: 'HRA:dash', name: '-', elements: atlas.concepts[0]!.elements }] };
+    expect(askablePool(dashed, ['skeletal']).map((a) => a.id)).not.toContain('HRA:dash');
   });
 
   it('leaves out systems that were not asked for', () => {

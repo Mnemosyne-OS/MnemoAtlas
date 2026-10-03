@@ -92,7 +92,10 @@ export function regionsFor(parts: Pick<Part, 'name' | 'bounds'>[], body: Box): R
   return REGIONS.filter(r => found.has(r));
 }
 
-/** The areas worth offering: inside the chosen region (all when none), and present in this body. */
+/** Fewer meshes than this is not a study area, it is a few stray pieces. */
+export const MIN_AREA_PARTS = 8;
+
+/** The areas worth offering: inside the chosen region (all when none), and a real cluster in this body. */
 export function areasFor(parts: Pick<Part, 'name' | 'bounds'>[], body: Box, region: RegionId | null): AreaId[] {
-  return AREAS.filter(a => (!region || a.regions.includes(region)) && parts.some(p => partInArea(p, a.id, body))).map(a => a.id);
+  return AREAS.filter(a => (!region || a.regions.includes(region)) && parts.filter(p => partInArea(p, a.id, body)).length >= MIN_AREA_PARTS).map(a => a.id);
 }

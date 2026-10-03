@@ -38,6 +38,12 @@ describe('searchConcepts', () => {
     expect(searchConcepts(concepts, 'coeur')).toEqual([]);
   });
 
+  it('leaves a precise, several-word query alone', () => {
+    expect(synonymsOf('pulmonary valve')).toEqual([]);
+    expect(synonymsOf('left lung')).toEqual([]);
+    expect(synonymsOf('lungs')).toContain('bronch');
+  });
+
   it('adds nothing to a term without synonyms', () => {
     expect(searchConcepts(concepts, 'heart').map(x => x.name)).toEqual(['heart']);
     expect(synonymsOf('heart')).toEqual([]);

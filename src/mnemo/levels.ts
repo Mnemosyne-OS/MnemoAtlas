@@ -75,7 +75,9 @@ export function askablePool(atlas: Atlas, systems: SystemId[]): Askable[] {
       const s = partSystem.get(e);
       if (s && wanted.has(s)) { system = s; break; }
     }
-    if (system) out.push({ id: c.id, name: c.name, system });
+    // A name with no letter in it (the female reference names 170 concepts
+    // « - ») cannot be asked about: four dashes are not four answers.
+    if (system && /\p{L}/u.test(c.name)) out.push({ id: c.id, name: c.name, system });
   }
   return out;
 }

@@ -28,7 +28,11 @@ export function synonymsOf(query: string): string[] {
   const term = fold(query.trim());
   if (!term) return [];
   const out = new Set<string>();
-  for (const row of SYNONYMS) if (row.when.some(w => term.includes(w))) row.also.forEach(a => out.add(a));
+  // Only a broad, single-word query is widened (« lung », « poumons »). A precise
+  // one like « pulmonary valve » keeps its own hits: widened, it returned 80
+  // bronchi under the one valve that was asked for.
+  const single = !term.includes(' ');
+  for (const row of SYNONYMS) if (row.when.some(w => (w.includes(' ') ? term === w : single && term.startsWith(w)))) row.also.forEach(a => out.add(a));
   out.delete(term);
   return [...out];
 }

@@ -160,6 +160,14 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
     .filter((a) => askableIn(names, a.id))
     .map((a) => ({ ...a, name: nameOf(names, a.id, a.name) })), [atlas, names]);
 
+  /**
+   * How many structures of THIS body the quiz can ask in this language. The
+   * names file is shared by both bodies and also names meshes, so its size
+   * (1,579 in French) is not a count of anything that will be asked.
+   */
+  // levels[0] is the whole-body tile (levelsOf puts it in front).
+  const askableTotal = levels[0] ? poolFor(levels[0]).length : 0;
+
   const ask = useCallback((lv: Level, state: ReviewState, asked: ReadonlySet<string>) => {
     const q = nextQuestion(poolFor(lv), state, Date.now(), (Math.random() * 2 ** 31) | 0, 4, asked);
     setAnswered(null);
@@ -289,7 +297,7 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
         <div className="names-notice" role="note">
           <strong>{t('names.title')}</strong>
           <p>{t('names.body')}</p>
-          <p>{t('names.pool', { n: names.count.toLocaleString() })}</p>
+          <p>{t('names.pool', { n: askableTotal.toLocaleString() })}</p>
           <p className="names-help">{t('names.help')}</p>
           <Button className="primary-action" onClick={() => setNoticeSeen(true)}>{t('names.ok')}</Button>
         </div>

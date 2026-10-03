@@ -137,6 +137,24 @@ describe('parsing what came back from the host', () => {
 describe('building a question', () => {
   it('refuses to ask when there is nothing to choose between', () => {
     expect(nextQuestion([], emptyState(), T0, 1)).toBeNull();
+  });
+
+  it('never shows the same name twice in one question', () => {
+    // The female reference has concepts that share a name; a twin offered
+    // next to its twin makes one of two identical answers wrong.
+    const twins = [
+      { id: 'A1', name: 'sigmoid artery', system: 'arterial' },
+      { id: 'A2', name: 'sigmoid artery', system: 'arterial' },
+      { id: 'A3', name: 'Sigmoid artery ', system: 'arterial' },
+      { id: 'A4', name: 'renal artery', system: 'arterial' },
+      { id: 'A5', name: 'aorta', system: 'arterial' },
+      { id: 'A6', name: 'aorta', system: 'arterial' },
+    ];
+    for (let seed = 1; seed < 200; seed++) {
+      const q = nextQuestion(twins, emptyState(), T0, seed)!;
+      const names = q.options.map((o) => o.name.trim().toLowerCase());
+      expect(new Set(names).size, `seed ${seed}`).toBe(names.length);
+    }
     expect(nextQuestion([pool[0]!], emptyState(), T0, 1)).toBeNull();
   });
 
