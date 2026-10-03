@@ -209,7 +209,7 @@ h1 .edition{font-family:inherit;font-weight:500;font-size:10px;letter-spacing:.0
 /* Hiding one structure (upstream human-atlas #421). Clear and Hide share a row so
    the detail sheet does not grow by a button on a phone. */
 .detail-secondary{display:flex;gap:4px}
-.detail-secondary .secondary-action{flex:1;gap:6px}
+.detail-secondary .secondary-action{flex:1;gap:6px;min-width:0;white-space:normal;line-height:1.2;text-align:center}
 .restore-hidden{width:100%;justify-content:center;font-size:11px;color:var(--teal);padding:8px 0;border-top:1px solid var(--hc-18253612)}
 
 /* Regions and study areas (upstream human-atlas #1). The area grid scrolls on
