@@ -139,6 +139,13 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   }, []);
 
   const write = (next: ReviewState) => {
+    // 🚨 Before the schedule is READ, `held` is an empty stand-in: writing it
+    // merged {one card} over the stored history and erased it (doc 115 pass,
+    // 05/10; doc 96's rule: a mutation before the first read writes nothing).
+    if (store.kind === 'loading') {
+      console.warn('[atlas] review answer before the schedule was read: not written');
+      return;
+    }
     if (store.kind === 'unsaved') { setStore({ ...store, state: next }); return; }
     setStore({ kind: 'ready', state: next });
     // Merged, never sent alone: the host replaces the whole blob, and the
@@ -319,7 +326,7 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
               const inLang = { ...lv, total: poolFor(lv).length };
               const v = canStudy(inLang);
               return (
-                <button key={lv.id} type="button" className={`review-tile ${v.ok ? '' : 'locked'}`} disabled={!v.ok}
+                <button key={lv.id} type="button" className={`review-tile ${v.ok ? '' : 'locked'}`} disabled={!v.ok || store.kind === 'loading'}
                   onClick={() => v.ok && setLevel(inLang)}>
                   <span className="tile-top">
                     <span className="tile-dot" style={{ background: lv.color }} />

@@ -1,3 +1,11 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/Mnemosyne-OS/Mnemosyne-Neural-OS/main/assets/banner-mnemosyne-os.png" width="100%" alt="Mnemosyne OS — Your memory. Your machine. Your rules." />
+
+🌐 [**mnemosyne-os.io**](https://mnemosyne-os.io) — the product&ensp;·&ensp;[**mnemosyne-os.com**](https://mnemosyne-os.com) — for organizations&ensp;·&ensp;📖 [**docs.mnemosyne-os.io**](https://docs.mnemosyne-os.io) — the documentation
+
+</div>
+
 # Atlas
 
 An interactive 3D atlas of the human body, running inside [Mnemosyne OS](https://mnemosyne-os.io) with no network connection at all.
@@ -105,3 +113,18 @@ Install it from MnemoHub like any other cartridge. Nothing is built, downloaded 
 ## Licence
 
 MIT, with the upstream copyright preserved. Anatomy data under CC BY 4.0, except the peripheral nerves (CC BY-SA 4.0). Structure names from Wikidata under CC0. See [`LICENSE`](./LICENSE) and [`NOTICE.md`](./NOTICE.md).
+
+## Where Mnemosyne OS lives
+
+This cartridge runs inside **Mnemosyne OS**, the sovereign, local-first memory operating system published by XPACEGEMS LLC. Its official addresses:
+
+- Product site: <https://mnemosyne-os.io>
+- Organizations: <https://mnemosyne-os.com>
+- Documentation: <https://docs.mnemosyne-os.io>
+- Host source: <https://github.com/Mnemosyne-OS/Mnemosyne-Neural-OS>
+- Packages: the npm scope `@mnemosyne_os`
+
+---
+
+<sub>**[Mnemosyne OS](https://mnemosyne-os.io)** — the sovereign, local-first memory OS this cartridge runs in.
+Get it at [mnemosyne-os.io/download](https://mnemosyne-os.io/download), install cartridges from the built-in MnemoHub store, or [build your own](https://mnemosyne-os.io/dev).</sub>

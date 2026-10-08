@@ -1,6 +1,6 @@
 {
   "name": "@mnemosyne-plugins/mnemo-atlas",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": true,
   "type": "module",
   "description": "3D anatomy explorer wired to Mnemosyne memory. Ports ashemag/human-atlas (MIT) onto the cartridge shell; anatomy data is BodyParts3D 4.0 and HuBMAP HRA (CC BY 4.0), peripheral nerves from Z-Anatomy (CC BY-SA 4.0).",
@@ -37,7 +37,7 @@
     "tailwindcss": "4.2.1",
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
-    "vitest": "^1.6.1"
+    "vitest": "^3.2.7"
   },
   "repository": {
     "type": "git",
