@@ -22,5 +22,6 @@ export interface Part {id:string;name:string;conceptId:string;system:SystemId;ch
 export interface Concept {id:string;name:string;elements:string[]}
 export interface Atlas {version:string;sex?:'male';source?:string;scope?:string;parts:Part[];concepts:Concept[];chunks:{url:string;bytes:number;gzip?:string;gzipBytes?:number}[];triangles:number}
 export type View = 'three-quarter'|'front'|'back'|'side';
-export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];hidden:string[];selected:string[];isolate:boolean;region:RegionId|null;area:AreaId|null;frameIds?:string[];view:View;viewBeforeExplode?:View;rotate:boolean;reset:number}
+/** `beat`: the heart chambers follow a schematic cycle (heartbeat.ts); off by default, Reset clears it like `rotate`. */
+export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];hidden:string[];selected:string[];isolate:boolean;region:RegionId|null;area:AreaId|null;frameIds?:string[];view:View;viewBeforeExplode?:View;rotate:boolean;rotatePace?:number;beat:boolean;reset:number}
 export const DEFAULT_VISIBLE:SystemId[] = ['cardiac','sensory','skeletal','muscular','arterial','venous','nervous','respiratory','digestive','urinary','lymphatic','endocrine','reproductive','connective'];

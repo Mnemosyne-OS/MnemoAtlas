@@ -23,7 +23,10 @@ function initialLang(): Lang {
     // 'fr-CA' and 'fr' are the same language for a toolbar.
     const base = q?.split('-')[0]?.toLowerCase();
     if (isLang(base)) return base;
-  } catch { /* no location in a test environment */ }
+  } catch (err) {
+    // No location in a test environment: English, said once in the console.
+    console.debug('[atlas] no frame location to read a language from:', err instanceof Error ? err.message : err);
+  }
   return 'en';
 }
 

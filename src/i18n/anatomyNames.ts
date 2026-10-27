@@ -54,25 +54,29 @@ export function useAnatomyNames(lang: Lang): AnatomyNames {
       setState({ map: known, ready: true, count: Object.keys(known).length, translated: true });
       return;
     }
-    let cancelled = false;
+    // Aborted on a language switch or unmount, and bounded in time: a fetch
+    // that hung left `ready` false and the quiz saying « loading names » for good.
+    const abort = new AbortController();
     setState({ map: {}, ready: false, count: 0, translated: true });
-    fetch(assetUrl(`/names/${lang}.json`))
+    fetch(assetUrl(`/names/${lang}.json`), { signal: AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]) })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((map: NameMap) => {
-        if (cancelled) return;
+        if (abort.signal.aborted) return;
         cache.set(lang, map);
         setState({ map, ready: true, count: Object.keys(map).length, translated: true });
       })
       .catch((err: unknown) => {
-        if (cancelled) return;
-        // A language with no file is not an error the reader caused, and it is
-        // not a blank screen either: the atlas falls back to English names and
-        // says nothing, which is what an untranslated corpus honestly is.
+        if (abort.signal.aborted) return;
+        // A language with no file, or one that did not arrive, is not an error
+        // the reader caused: the atlas falls back to English names and SAYS so
+        // through `translated: false`, so the quiz keeps asking on the English
+        // names instead of finding an empty pool, and no « translated names »
+        // notice is shown for names that do not exist. The failure is not
+        // cached: the next switch to this language tries again.
         console.warn('[atlas] no names for', lang, err instanceof Error ? err.message : err);
-        cache.set(lang, {});
-        setState({ map: {}, ready: true, count: 0, translated: true });
+        setState({ map: {}, ready: true, count: 0, translated: false });
       });
-    return () => { cancelled = true; };
+    return () => { abort.abort(); };
   }, [lang]);
 
   return state;

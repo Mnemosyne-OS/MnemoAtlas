@@ -1,5 +1,15 @@
 import {describe, it, expect} from 'vitest';
-import {hideSelection, isShown, shownBy, unhide} from './visibility';
+import {hideSelection, isShown, selectionTint, shownBy, unhide} from './visibility';
+
+describe('selectionTint', () => {
+  it('an isolated organ keeps its own colours: no highlight at all', () => {
+    expect(selectionTint(true)).toBe(0);
+  });
+  it('a selection among other pieces is tinted, but less than half', () => {
+    expect(selectionTint(false)).toBeGreaterThan(0);
+    expect(selectionTint(false)).toBeLessThan(0.5);
+  });
+});
 import type {SystemId} from './anatomy';
 
 const box: [number[], number[]] = [[0, 0, 0], [0, 0, 0]];

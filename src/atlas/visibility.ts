@@ -25,6 +25,19 @@ export function isShown(p: Placed, v: ShownBy): boolean {
   return v.visible.has(p.system) && !v.hidden.has(p.id) && (!v.place || v.place(p));
 }
 
+/**
+ * How much of the highlight colour a selected piece takes, 0..1.
+ *
+ * Upstream mixed 75% of a pale teal into every selected piece. Isolated, the
+ * selection IS everything on screen, so the highlight told nothing and an
+ * organ of 83 pieces showed white: the heart lost its red the moment someone
+ * looked at it alone. Isolated: none, the organ keeps its system colours.
+ * Among other pieces: enough to find it, not enough to lose what it is.
+ */
+export function selectionTint(isolate: boolean): number {
+  return isolate ? 0 : 0.45;
+}
+
 /** Hide what is selected; the selection itself is cleared so the hide takes effect. */
 export function hideSelection<S extends {hidden: string[]; selected: string[]; isolate: boolean}>(s: S): S {
   return {...s, hidden: [...new Set([...s.hidden, ...s.selected])], selected: [], isolate: false};

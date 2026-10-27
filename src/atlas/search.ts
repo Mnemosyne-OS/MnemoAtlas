@@ -54,3 +54,6 @@ export function searchConcepts(concepts: Concept[], query: string, label?: (c: C
   const viaSynonym = concepts.filter(c => !seen.has(c) && haystack(c).some(h => extra.some(e => h.includes(e)))).sort(byLength);
   return [...direct, ...viaSynonym].slice(0, limit);
 }
+
+/** What the search panel offers before anything is typed, and what an agent gets with no words. */
+export const STARTER_ORGANS = ['heart', 'brain', 'liver', 'stomach', 'spleen', 'pancreas', 'urinary bladder', 'trachea', 'left lung', 'right lung'];

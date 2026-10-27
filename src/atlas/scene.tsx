@@ -8,16 +8,19 @@ import {decodeModelResponse} from './model-download';
 import {assetUrl} from './asset-url';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
+import {autoRotating} from './agentResolve';
+import {getRotateSpeed} from './rotateSettings';
 import {EXPLODE_ACTION,dollyDistance,listenToGestures,orbitOffset,panAmount} from './gestures';
 import {getSpeeds} from './gestureSettings';
-import {isShown,shownBy} from './visibility';
+import {isShown,selectionTint,shownBy} from './visibility';
 import {fitTarget} from './camera-fit';
 import {bodyBounds,placeFilter} from './regions';
-/** onError receives an i18n key (err.*); the page translates it. */
-interface Props {atlas:Atlas;state:SceneState;ariaLabel?:string;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onAction?:(id:string)=>void;onExplodeBy?:(factor:number)=>void}
-export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,onError,onAction,onExplodeBy}:Props){
- const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),action=useRef(onAction),explodeBy=useRef(onExplodeBy);
- latest.current=state;select.current=onSelect;action.current=onAction;explodeBy.current=onExplodeBy;
+import {beatPhase,beatScale,heartRole,type HeartRole} from './heartbeat';
+/** onError receives an i18n key (err.*); the page translates it. labelOf names a hovered piece in the app's language (the page's own label). */
+interface Props {atlas:Atlas;state:SceneState;ariaLabel?:string;labelOf?:(conceptId:string,english:string)=>string;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onAction?:(id:string)=>void;onExplodeBy?:(factor:number)=>void;onRotateStop?:()=>void}
+export default function AnatomyScene({atlas,state,ariaLabel,labelOf,onSelect,onProgress,onError,onAction,onExplodeBy,onRotateStop}:Props){
+ const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),action=useRef(onAction),explodeBy=useRef(onExplodeBy),rotateStop=useRef(onRotateStop),nameFor=useRef(labelOf);
+ latest.current=state;select.current=onSelect;action.current=onAction;explodeBy.current=onExplodeBy;rotateStop.current=onRotateStop;nameFor.current=labelOf;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastRegion:string|null='',lastArea:string|null='',lastFrame:string[]|undefined=undefined,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -31,6 +34,8 @@ export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,
   // Zoom toward what the pointer is on, not toward a fixed centre. fit() and
   // isolate set the target explicitly, so they are unaffected (upstream #176).
   controls.zoomToCursor=true;controls.minDistance=.07;controls.maxDistance=40;controls.maxPolarAngle=Math.PI*.96;controls.addEventListener('change',()=>{dirty=true;});
+  // The person's hand takes the camera: a turn that was going stops for good, it never fights the drag.
+  controls.addEventListener('start',()=>{if(controls.autoRotate)rotateStop.current?.();});
   const pmrem=new T.PMREMGenerator(renderer),room=new RoomEnvironment(),env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();
   scene.add(new T.HemisphereLight(0xffffff,0xa7acb2,1.05));
   const key=new T.DirectionalLight(0xfffaf4,2.3);key.position.set(-2,4,3);scene.add(key);
@@ -42,6 +47,15 @@ export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,
   const width=T.MathUtils.ceilPowerOfTwo(atlas.parts.length),data=new Float32Array(width*4),partTexture=new T.DataTexture(data,width,1,T.RGBAFormat,T.FloatType);partTexture.needsUpdate=true;
   const selectedData=new Uint8Array(width*4),selectionTexture=new T.DataTexture(selectedData,width,1);selectionTexture.needsUpdate=true;
   const materials:T.Material[]=[],geometries:T.BufferGeometry[]=[],pickers:(T.Mesh|undefined)[]=[],centers=atlas.parts.map(p=>new T.Vector3().fromArray(p.bounds[0]).add(new T.Vector3().fromArray(p.bounds[1])).multiplyScalar(.5));
+  // The heartbeat (heartbeat.ts): one scale per part about its own centre,
+  // read by the vertex shader before the exploded-view offset. Every part
+  // starts at 1; only the chamber meshes listed here are ever written.
+  const pulseData=new Float32Array(width*4),pulseTexture=new T.DataTexture(pulseData,width,1,T.RGBAFormat,T.FloatType);
+  centers.forEach((c,i)=>pulseData.set([c.x,c.y,c.z,1],i*4));pulseTexture.needsUpdate=true;
+  const beating:{index:number;role:HeartRole}[]=[];atlas.parts.forEach((p,i)=>{const role=heartRole(p);if(role)beating.push({index:i,role});});
+  let beatStart=-1,wasPulsing=false;
+  // One uniform shared by every material: the highlight strength (visibility.ts selectionTint).
+  const selectionMix={value:selectionTint(state.isolate)};
   const offsets:T.Vector3[]=[],bounds=atlas.parts.map(p=>new T.Box3(new T.Vector3().fromArray(p.bounds[0]),new T.Vector3().fromArray(p.bounds[1])));
   let packingWidth=1,packingHeight=1;
   const markerPositions=new Float32Array(atlas.parts.length*3),markerGeometry=new T.BufferGeometry();markerGeometry.setAttribute('position',new T.BufferAttribute(markerPositions,3));
@@ -64,12 +78,13 @@ export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,
   const materialFor=(system:string)=>{
    const m=new T.MeshStandardMaterial({color:SYSTEMS.find(s=>s.id===system)?.color??'#aebbb8',metalness:.08,roughness:.53,side:T.DoubleSide,transparent:system==='integumentary',opacity:system==='integumentary'?.1:1,depthWrite:system!=='integumentary'});
    m.onBeforeCompile=shader=>{
-    shader.uniforms.partState={value:partTexture};shader.uniforms.selectionState={value:selectionTexture};shader.uniforms.stateWidth={value:width};
-    shader.vertexShader='attribute float partIndex; uniform sampler2D partState; uniform sampler2D selectionState; uniform float stateWidth; varying float partVisible; varying float partSelected;\n'+shader.vertexShader;
-    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvec2 stateUv = vec2((partIndex + 0.5) / stateWidth, 0.5); vec4 state = texture2D(partState, stateUv); transformed += state.xyz; partVisible = state.w; partSelected = texture2D(selectionState, stateUv).r;');
-    shader.fragmentShader='varying float partVisible; varying float partSelected;\n'+shader.fragmentShader;
+    shader.uniforms.partState={value:partTexture};shader.uniforms.selectionState={value:selectionTexture};shader.uniforms.pulseState={value:pulseTexture};shader.uniforms.stateWidth={value:width};shader.uniforms.selectionMix=selectionMix;
+    shader.vertexShader='attribute float partIndex; uniform sampler2D partState; uniform sampler2D selectionState; uniform sampler2D pulseState; uniform float stateWidth; varying float partVisible; varying float partSelected;\n'+shader.vertexShader;
+    // Scale about the part's centre (the beat) BEFORE the offset (the exploded view): a beating heart laid apart still beats where it lies.
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvec2 stateUv = vec2((partIndex + 0.5) / stateWidth, 0.5); vec4 state = texture2D(partState, stateUv); vec4 pulse = texture2D(pulseState, stateUv); transformed = pulse.xyz + (transformed - pulse.xyz) * pulse.w; transformed += state.xyz; partVisible = state.w; partSelected = texture2D(selectionState, stateUv).r;');
+    shader.fragmentShader='varying float partVisible; varying float partSelected; uniform float selectionMix;\n'+shader.fragmentShader;
     shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif (partVisible < 0.5) discard;');
-    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.85, 0.78), partSelected * 0.75);');
+    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.85, 0.78), partSelected * selectionMix);');
    };materials.push(m);return m;
   };
   const mats=new Map(SYSTEMS.map(s=>[s.id,materialFor(s.id)]));
@@ -107,7 +122,7 @@ export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,
   const resize=()=>{layoutKey='';lastState=null;renderer.setPixelRatio(Math.min(devicePixelRatio,el.clientWidth<768||el.clientHeight<600?1.5:2));camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);fit(latest.current.view,amount);};const observer=new ResizeObserver(resize);observer.observe(el);
   const raycaster=new T.Raycaster(),pointer=new T.Vector2(),tap=new PointerTap(),worldBox=new T.Box3(),hitPoint=new T.Vector3();
   const down=(e:PointerEvent)=>{hover.hidden=true;tap.down(e.pointerId,e.clientX,e.clientY,e.pointerType==='touch'?12:5);};
-  const move=(e:PointerEvent)=>{tap.move(e.pointerId,e.clientX,e.clientY);if(e.buttons||amount<.5||e.pointerType==='touch'){hover.hidden=true;return;}const rect=el.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top,index=findTarget(x,y,12);hover.hidden=index<0;renderer.domElement.style.cursor=index<0?'grab':'pointer';if(index>=0){hover.textContent=atlas.parts[index].name;hover.style.left=`${Math.max(8,Math.min(x+14,el.clientWidth-260))}px`;hover.style.top=`${Math.max(8,Math.min(y+18,el.clientHeight-55))}px`;}};
+  const move=(e:PointerEvent)=>{tap.move(e.pointerId,e.clientX,e.clientY);if(e.buttons||amount<.5||e.pointerType==='touch'){hover.hidden=true;return;}const rect=el.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top,index=findTarget(x,y,12);hover.hidden=index<0;renderer.domElement.style.cursor=index<0?'grab':'pointer';if(index>=0){{const p=atlas.parts[index];hover.textContent=nameFor.current?nameFor.current(p.conceptId,p.name):p.name;}hover.style.left=`${Math.max(8,Math.min(x+14,el.clientWidth-260))}px`;hover.style.top=`${Math.max(8,Math.min(y+18,el.clientHeight-55))}px`;}};
   const cancel=(e:PointerEvent)=>tap.cancel(e.pointerId);
   // One picking path for a tap and for a hand's « select » (doc 106 §32), so
   // the two can never disagree on which structure is under the point.
@@ -181,12 +196,22 @@ export default function AnatomyScene({atlas,state,ariaLabel,onSelect,onProgress,
     }else if(lastIsolate){camera.clearViewOffset();fit(s.view,amount);}
     lastIsolate=isolateKey;
    }
-   controls.enableRotate=amount<.8;controls.mouseButtons.LEFT=amount<.8?T.MOUSE.ROTATE:T.MOUSE.PAN;controls.touches.ONE=amount<.8?T.TOUCH.ROTATE:T.TOUCH.PAN;ground.visible=platform.visible=ring.visible=innerRing.visible=amount<.5&&!s.isolate;markers.visible=amount>.75;controls.autoRotate=s.rotate&&!s.isolate&&amount<.4;controls.autoRotateSpeed=.65;controls.update();if(controls.autoRotate)dirty=true;
+   // The beat repaints every frame only while a chamber is on screen: a valve
+   // stop of the heart visit isolates meshes that hold still, and the loop
+   // falls silent there. Falling silent writes 1 back once AND drops the
+   // phase origin: a resume (valve stop → ventricle stop) begins at the
+   // atrial kick, where every chamber is at 1, never with a jump into a
+   // contraction the clock kept running in the dark.
+   const tint=selectionTint(s.isolate);if(selectionMix.value!==tint){selectionMix.value=tint;dirty=true;}
+   const pulsing=s.beat&&beating.some(b=>data[b.index*4+3]>.5);
+   if(pulsing){if(beatStart<0)beatStart=clock.elapsedTime;const phase=beatPhase(clock.elapsedTime-beatStart);for(const b of beating)pulseData[b.index*4+3]=beatScale(b.role,phase);pulseTexture.needsUpdate=true;dirty=true;wasPulsing=true;}
+   else if(wasPulsing){for(const b of beating)pulseData[b.index*4+3]=1;pulseTexture.needsUpdate=true;dirty=true;wasPulsing=false;beatStart=-1;}
+   controls.enableRotate=amount<.8;controls.mouseButtons.LEFT=amount<.8?T.MOUSE.ROTATE:T.MOUSE.PAN;controls.touches.ONE=amount<.8?T.TOUCH.ROTATE:T.TOUCH.PAN;ground.visible=platform.visible=ring.visible=innerRing.visible=amount<.5&&!s.isolate;markers.visible=amount>.75;controls.autoRotate=autoRotating({rotate:s.rotate,explode:amount});controls.autoRotateSpeed=getRotateSpeed()*(s.rotatePace??1);controls.update(dt);if(controls.autoRotate)dirty=true;
    if(dirty){renderer.render(scene,camera);targets=[];if(amount>.45){const hasSolid=atlas.parts.some((p,i)=>p.system!=='integumentary'&&data[i*4+3]>.5);atlas.parts.forEach((p,i)=>{if(data[i*4+3]<.5||(hasSolid&&p.system==='integumentary'))return;let left=Infinity,right=-Infinity,top=Infinity,bottom=-Infinity;for(let corner=0;corner<8;corner++){projected.set(p.bounds[(corner&1)?1:0][0]+data[i*4],p.bounds[(corner&2)?1:0][1]+data[i*4+1],p.bounds[(corner&4)?1:0][2]+data[i*4+2]).project(camera);const x=(projected.x+1)*el.clientWidth/2,y=(1-projected.y)*el.clientHeight/2;left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}projected.copy(centers[i]).add(new T.Vector3(data[i*4],data[i*4+1],data[i*4+2])).project(camera);if(projected.z< -1||projected.z>1)return;targets.push({index:i,x:(projected.x+1)*el.clientWidth/2,y:(1-projected.y)*el.clientHeight/2,left,right,top,bottom});});}dirty=false;}
 
   };animate();
   const contextLost=(e:Event)=>{e.preventDefault();onError('err.context');};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  return()=>{disposed=true;themeWatch.disconnect();stopGestures();abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();renderer.dispose();renderer.domElement.remove();};
+  return()=>{disposed=true;themeWatch.disconnect();stopGestures();abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();pulseTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();renderer.dispose();renderer.domElement.remove();};
  },[atlas]);
  return <div className="scene" ref={host}/>;
 }

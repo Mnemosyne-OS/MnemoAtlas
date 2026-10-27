@@ -48,6 +48,7 @@ const RANK_KEY: Record<Rank, Key> = { Perfect: 'rank.perfect', Excellent: 'rank.
 import { useI18n } from '../i18n/useI18n';
 import type { Key } from '../i18n/strings';
 import { askableIn, nameOf, useAnatomyNames } from '../i18n/anatomyNames';
+import { reviewDoor } from './reviewDoor';
 
 const sdk = new MnemoCartridgeSDK('@mnemosyne-plugins/mnemo-atlas');
 
@@ -89,7 +90,17 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   const names = useAnatomyNames(lang);
   const [noticeSeen, setNoticeSeen] = useState(false);
   const alive = useRef(true);
-  useEffect(() => () => { alive.current = false; }, []);
+  // Re-armed on mount: a cleanup also runs when React hides and reveals a
+  // subtree, and a ref left false would drop every answer that comes after.
+  // The unmount also takes down the door this panel published (reviewDoor),
+  // and only its own: a panel that replaced it keeps its door.
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      if (reviewDoor.current?.owner === alive) reviewDoor.current = null;
+    };
+  }, []);
 
   const storeState = (s: Store): ReviewState => (s.kind === 'loading' ? emptyState() : s.state);
   const held = storeState(store);
@@ -98,7 +109,7 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   // A system is named from the strings table, keyed by its id. `lv.name` is
   // the English label anatomy.ts carries for the 3D layers panel; using it
   // here would put one English word inside a translated tile.
-  const levelName = (lv: Level) => (lv.id === ALL_LEVEL ? t('level.all') : t(`system.${lv.id}` as Key));
+  const levelName = (lv: Level) => lv.label ?? (lv.id === ALL_LEVEL ? t('level.all') : t(`system.${lv.id}` as Key));
   const refusal = (lv: Level) => { const v = canStudy(lv); return v.ok ? '' : t(v.why === 'empty' ? 'review.empty' : 'review.tooSmall', { n: v.n }); };
   const askedIds = new Set(run?.answers.map((a) => a.id) ?? []);
   const finished = !!run && isComplete(run);
@@ -153,7 +164,7 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
     writeKey(KEY, next).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn('[atlas] review state not saved:', msg);
-      if (alive.current) setStore({ kind: 'unsaved', state: next, why: 'The last answers could not be saved.' });
+      if (alive.current) setStore({ kind: 'unsaved', state: next, why: t('review.notSaved') });
     });
   };
 
@@ -166,6 +177,8 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
    * too, so what the option says is what the tile counted.
    */
   const poolFor = useCallback((lv: Level) => askablePool(atlas, lv.systems)
+    // A scope said aloud (a region, an organ) narrows the systems to its structures.
+    .filter((a) => !lv.only || lv.only.includes(a.id))
     .filter((a) => askableIn(names, a.id))
     .map((a) => ({ ...a, name: nameOf(names, a.id, a.name) })), [atlas, names]);
 
@@ -215,7 +228,9 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   // ── filing the run as a memory ───────────────────────────────────────────
   const saveRun = async () => {
     if (!run) return;
-    const scopeNames = (level?.systems ?? []).map((s) => SYSTEMS.find((x) => x.id === s)?.name ?? s);
+    // A scope said aloud (a region, an organ) is named as it was resolved: its
+    // systems would claim the run covered every system of the body.
+    const scopeNames = level?.label ? [level.label] : (level?.systems ?? []).map((s) => SYSTEMS.find((x) => x.id === s)?.name ?? s);
     const note = sessionNote(run.answers, { body, source, scopeNames, now: Date.now() });
     if (!note) return; // nothing happened, so there is nothing to record
     setSaving({ kind: 'busy' });
@@ -271,8 +286,38 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
   const screen: 'levels' | 'length' | 'run' | 'results' =
     !level ? 'levels' : !run ? 'length' : finished ? 'results' : 'run';
 
+  // The agents' door (reviewDoor): the same functions as the buttons below,
+  // published on every render so a call made after a flush sees this render.
+  // A plain assignment, never a hook (see reviewDoor.ts).
+  reviewDoor.current = {
+    owner: alive,
+    ready: store.kind !== 'loading' && names.ready,
+    kept: store.kind === 'ready',
+    screen, level, run, question, answered,
+    levelName,
+    levels: () => levels.map((lv) => ({ ...lv, total: poolFor(lv).length })),
+    poolSize: (lv) => poolFor(lv).length,
+    english: (id) => conceptById.get(id)?.name,
+    start: (lv, length) => {
+      // The translation notice is said, not clicked, on this path: the door
+      // hands its words to the agent (the names were checked loaded above).
+      setNoticeSeen(true);
+      setSaving({ kind: 'idle' });
+      setLevel(lv);
+      setRun(startRun(length, Date.now()));
+      ask(lv, held, new Set());
+    },
+    rescope: (lv) => setLevel(lv),
+    answer,
+    next: () => { if (level) ask(level, held, askedIds); },
+    skip: () => { if (level && question) ask(level, held, new Set([...askedIds, question.subject.id])); },
+    reshow: () => { if (question) onShow(conceptById.get(question.subject.id)?.elements ?? []); },
+    finish: () => { if (run) setRun(endRun(run)); },
+    close: onClose,
+  };
+
   return (
-    <section className={`review-panel glass ${screen === 'run' || screen === 'results' ? 'wide' : ''}`} aria-label="Review">
+    <section className={`review-panel glass ${screen === 'run' || screen === 'results' ? 'wide' : ''}`} aria-label={t('review.title')}>
       <div className="panel-heading">
         <span className="review-title">
           {level ? (
@@ -295,6 +340,7 @@ export function ReviewPanel({ atlas, body, source, onShow, onInspect, onStudying
         </div>
       )}
 
+      {store.kind === 'loading' && screen !== 'run' && <p className="review-note" role="status">{t('review.loading')}</p>}
       {store.kind === 'unsaved' && screen !== 'run' && <p className="review-note review-warn" role="status">{store.why}</p>}
       {size?.tight && screen !== 'run' && <p className="review-note review-warn">{t('review.tight')}</p>}
 

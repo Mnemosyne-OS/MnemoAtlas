@@ -46,7 +46,7 @@ function keysOf(): Key[] {
     'org.bladder', 'org.trachea', 'org.diaphragm', 'org.lungLeft', 'org.lungRight',
     'ui.title', 'ui.find', 'ui.systems', 'ui.all', 'ui.skeletonPreset', 'ui.organsPreset',
     'ui.hideAll', 'ui.visible', 'ui.noMatch', 'ui.explode', 'ui.assembled', 'ui.everyPiece',
-    'ui.reset', 'ui.credits', 'ui.preparing', 'ui.loading', 'ui.reload', 'ui.contextNote',
+    'ui.reset', 'ui.rotateSpeed', 'ui.turnTime', 'ui.rotateUnsaved', 'ui.credits', 'ui.preparing', 'ui.loading', 'ui.reload', 'ui.contextNote',
     'ui.atlasRef', 'ui.selectedPieces', 'ui.included', 'ui.andMorePieces', 'ui.viewSource',
     'ui.isolate', 'ui.showAround', 'ui.clear', 'ui.hideStructure', 'ui.restoreHidden', 'err.catalogue', 'err.load', 'err.webgl', 'err.context', 'a11y.scene', 'tour.group.organ', 'tour.group.nerve', 'tour.group.line', 'tour.lineNote', 'tour.name.trigeminal', 'tour.summary.trigeminal', 'tour.name.lineBack', 'tour.summary.lineBack', 'tour.name.lineFront', 'tour.summary.lineFront', 'tour.name.lineLateral', 'tour.summary.lineLateral', 'tour.name.lineDeep', 'tour.summary.lineDeep', 'org.trigeminal', 'org.ophthalmicNerve', 'org.maxillaryNerve', 'org.mandibularNerve', 'station.trigeminal.all', 'station.trigeminal.all.text', 'station.lineBack.sole', 'station.lineBack.sole.text', 'station.lineBack.calf', 'station.lineBack.calf.text', 'station.lineBack.hamstrings', 'station.lineBack.hamstrings.text', 'station.lineBack.spine', 'station.lineBack.spine.text', 'station.lineBack.all', 'station.lineBack.all.text', 'station.lineFront.shin', 'station.lineFront.shin.text', 'station.lineFront.thigh', 'station.lineFront.thigh.text', 'station.lineFront.neck', 'station.lineFront.neck.text', 'station.lineFront.all', 'station.lineFront.all.text', 'station.lineLateral.fibular', 'station.lineLateral.fibular.text', 'station.lineLateral.hip', 'station.lineLateral.hip.text', 'station.lineLateral.flank', 'station.lineLateral.flank.text', 'station.lineLateral.neck', 'station.lineLateral.neck.text', 'station.lineLateral.all', 'station.lineLateral.all.text', 'station.lineDeep.deepCalf', 'station.lineDeep.deepCalf.text', 'station.lineDeep.knee', 'station.lineDeep.knee.text', 'station.lineDeep.adductors', 'station.lineDeep.adductors.text', 'station.lineDeep.psoas', 'station.lineDeep.psoas.text', 'station.lineDeep.diaphragm', 'station.lineDeep.diaphragm.text', 'station.lineDeep.neck', 'station.lineDeep.neck.text', 'station.lineDeep.all', 'station.lineDeep.all.text', 'caption.selected', 'caption.inventory', 'caption.separated', 'tour.title', 'tour.open', 'tour.close', 'tour.pick', 'tour.stops', 'tour.prev', 'tour.next', 'tour.exit', 'tour.position', 'tour.name.heart', 'tour.name.respiratory', 'tour.name.digestive', 'tour.name.urinary', 'tour.name.reproductive', 'tour.summary.heart', 'tour.summary.respiratory', 'tour.summary.digestive', 'tour.summary.urinary', 'tour.summary.reproductive', 'org.rightAtrium', 'org.tricuspid', 'org.rightVentricle', 'org.pulmonaryValve', 'org.leftAtrium', 'org.mitral', 'org.leftVentricle', 'org.aorticValve', 'org.bronchus', 'org.lungs', 'org.esophagus', 'org.duodenum', 'org.smallIntestine', 'org.largeIntestine', 'org.cecum', 'org.rectum', 'org.gallbladder', 'org.kidney', 'org.ureter', 'org.urethra', 'org.testis', 'org.epididymis', 'org.deferentDuct', 'org.seminalVesicle', 'org.prostate', 'org.corpusCavernosum', 'org.ovary', 'org.fallopianTube', 'org.uterus', 'org.vagina', 'ui.regions', 'ui.areas', 'ui.wholeBody', 'region.head-neck', 'region.torso', 'region.abdomen', 'region.arm', 'region.pelvis', 'region.legs', 'area.orbit', 'area.willis', 'area.brainstem', 'area.larynx', 'area.heart', 'area.lung-root', 'area.porta', 'area.celiac', 'area.kidneys', 'area.brachial-plexus', 'area.axilla', 'area.cubital', 'area.wrist', 'area.hand', 'area.pelvic-viscera', 'area.popliteal', 'area.foot', 'ui.hintOrbit', 'ui.hintPan', 'ui.hintZoom',
     'ui.hintTap', 'ui.searchPlaceholder', 'ui.searchHintEmpty', 'ui.searchHintTyping',
@@ -54,7 +54,11 @@ function keysOf(): Key[] {
     'a11y.panels', 'a11y.search', 'a11y.about', 'a11y.layers', 'a11y.closeSystems',
     'a11y.findAnatomy', 'a11y.closeSearch', 'a11y.searchInput', 'a11y.camera', 'a11y.autoRotate',
     'a11y.resetAll', 'a11y.openLayers', 'a11y.assembleReset', 'a11y.showOnly', 'a11y.show',
-    'a11y.view', 'a11y.pause', 'a11y.rotate',
+    'a11y.view', 'a11y.pause', 'a11y.rotate', 'a11y.beat', 'a11y.beatStop', 'ui.beatNote', 'about.heartbeat',
+    'view.three-quarter', 'view.front', 'view.side', 'view.back', 'view.key.front', 'view.key.side', 'view.key.back',
+    'review.notSaved', 'review.loading', 'memory.noAnswer',
+    'voice.question', 'voice.questionOpen', 'voice.or', 'voice.right', 'voice.wrong', 'voice.next', 'voice.done',
+    'voice.skipped', 'voice.unclear', 'voice.answerFirst', 'voice.answered', 'voice.running', 'voice.closed',
     'about.eyebrow', 'about.title', 'about.leadMale', 'about.leadFemale', 'about.headMale',
     'about.headFemale', 'about.bodyMale', 'about.bodyFemale', 'about.incomplete',
     'about.disclaimer', 'about.source', 'about.femaleRef', 'about.nervesRef', 'about.nervesLicense', 'about.datasetLicense',
@@ -98,6 +102,7 @@ describe('language coverage', () => {
         'region.abdomen',      // "Abdomen" in English, French and Spanish
         'area.larynx',         // "Larynx" in English and French
         'tour.name.digestive', // "Digestion" in English and French
+        'view.key.front',      // the one letter "F" in all three
       ]);
       const gaps = untranslated.filter((k) => !expected.has(k));
       expect(gaps, `${lang} is missing ${gaps.length} keys`).toEqual([]);

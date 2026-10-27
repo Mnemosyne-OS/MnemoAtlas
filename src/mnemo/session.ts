@@ -18,7 +18,11 @@ import type { Answered } from './review';
 
 /** Run lengths offered. `null` means keep going until you stop. */
 export const LENGTHS = [5, 10, 50, null] as const;
-export type RunLength = (typeof LENGTHS)[number];
+/**
+ * A run's length: one the panel offers, or any count a person says aloud
+ * (« dix questions », « sept »). Null is endless.
+ */
+export type RunLength = number | null;
 
 /**
  * The label for a run length. `null` has no number to show and is named by the

@@ -55,4 +55,5 @@ function Button({
   );
 }
 
-export { Button, buttonVariants };
+// Only the component is exported: a file that also exports a value loses Fast Refresh.
+export { Button };

@@ -49,4 +49,5 @@ function Badge({
   });
 }
 
-export { Badge, badgeVariants };
+// Only the component is exported: a file that also exports a value loses Fast Refresh.
+export { Badge };

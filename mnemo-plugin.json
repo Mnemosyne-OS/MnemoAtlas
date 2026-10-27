@@ -1,7 +1,7 @@
 {
   "name": "@mnemosyne-plugins/mnemo-atlas",
   "displayName": "Atlas",
-  "version": "0.2.7",
+  "version": "0.2.9",
   "category": "Research",
   "vendor": "Mnemosyne Labs",
   "license": "MIT",
@@ -78,5 +78,500 @@
       "defaultWidth": 1180,
       "defaultHeight": 840
     }
-  ]
+  ],
+  "agentGuide": [
+    "Name a structure, a system, a region, a tour or a review answer the way the person says it (le foie, squelette, système digestif, tête et cou, the heart tour); an id still works. AMBIGUOUS lists the candidates: pick one and call again.",
+    "Show an organ: focus {structure} isolates and frames it; then explode {percent} if asked; then rotate LAST, every time an organ is shown, asked or not, unless the person wants it still (exploding or changing the view stops the turn). One cartridge.steps call for the three.",
+    "A review by voice: reviewStart {scope, questions} opens the review and asks (scope = systems, regions or organs said, none = whole body). While a question is open the person's words are an ANSWER: « c'est le foie », « le foie », « la deuxième » go to reviewAnswer {answer} (or {option} 1-4), never to focus. Then reviewNext; « je ne sais pas » / « passe » = reviewSkip; « répète » = reviewRepeat; « que le squelette maintenant » = reviewScope; « arrête » = reviewStop (close true to give the body back). reviewState says where it is.",
+    "While the body loads the host waits by itself (NOT_READY); reviewStart waits the same way while the review reads its schedule. After a rebuild, the window must be closed and reopened.",
+    "During a review run every view write is refused (QUIZ_RUNNING): the view is the person's; reviewStop with close true ends it.",
+    "Check with screen before saying it is done."
+  ],
+  "agentActions": [
+    {
+      "id": "structures",
+      "summary": "Find the structures of the body on screen by words (heart, femur, vagus, coeur): id, name, translated name, pieces, systems.",
+      "details": "Searches English names, atlas ids (FMA..., HRA:...) and the names in the reader's language. With no words, returns the organs the search panel offers first. Pass an id from here to focus.",
+      "effect": "read",
+      "params": {
+        "query": {
+          "type": "string",
+          "description": "Words to look for, in English or in the app's language. Empty lists the main organs.",
+          "maxLength": 120
+        },
+        "limit": {
+          "type": "number",
+          "description": "How many structures at most (default 30).",
+          "minimum": 1,
+          "maximum": 80
+        }
+      }
+    },
+    {
+      "id": "focus",
+      "summary": "Show one structure: select it, open its sheet, and fly the camera to it, the rest hidden (the sheet's Isolate button).",
+      "details": "structure is an atlas id or a name; several matches are refused with the candidates, an unknown one with the closest names. isolate false selects and highlights it in place, as a click on the body does, without moving the camera. Refused while a review question is on screen.",
+      "effect": "write",
+      "params": {
+        "structure": {
+          "type": "string",
+          "description": "The structure as said (heart, le foie, poumon gauche) or an atlas id (FMA7088).",
+          "maxLength": 120
+        },
+        "isolate": {
+          "type": "boolean",
+          "description": "True (default): only this structure, the camera framing it. False: highlighted among the rest."
+        }
+      },
+      "required": [
+        "structure"
+      ]
+    },
+    {
+      "id": "showSystems",
+      "summary": "Choose the body systems drawn: show only some, show or hide some, or all of them.",
+      "details": "Systems by id or as said (squelette, muscles, système nerveux, digestive): skeletal, muscular, cardiac, sensory, arterial, venous, nervous, respiratory, digestive, urinary, lymphatic, endocrine, reproductive, integumentary, pregnancy (female body only), connective. A system the current body does not have is refused. Clears the selection, as a system switch does, and showing a system starts the turn at the person's speed (rotate with on false stops it).",
+      "effect": "write",
+      "params": {
+        "mode": {
+          "type": "string",
+          "description": "only (default): just these; show / hide: add or remove these; all: every system of this body.",
+          "enum": [
+            "only",
+            "show",
+            "hide",
+            "all"
+          ]
+        },
+        "systems": {
+          "type": "list",
+          "description": "Systems by id or by name, as said; needed unless mode is all.",
+          "maxItems": 16
+        }
+      }
+    },
+    {
+      "id": "switchBody",
+      "summary": "Switch between the male reference (BodyParts3D) and the female one (HuBMAP HRA).",
+      "details": "The other body loads for a few seconds and the view starts fresh; call screen until loaded is true.",
+      "effect": "write",
+      "params": {
+        "body": {
+          "type": "string",
+          "description": "male or female.",
+          "enum": [
+            "male",
+            "female"
+          ]
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    {
+      "id": "explode",
+      "summary": "Open the body by stages: 0 assembled, 100 every piece laid apart (the explode slider).",
+      "details": "Above 80 the pieces lie flat and only the front view applies.",
+      "effect": "write",
+      "params": {
+        "percent": {
+          "type": "number",
+          "description": "0 (assembled) to 100 (every piece apart).",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "percent"
+      ]
+    },
+    {
+      "id": "cameraView",
+      "summary": "Turn the camera to a view of the body: three-quarter, front, side or back.",
+      "details": "Refused while the body is laid flat (explode above 80).",
+      "effect": "write",
+      "params": {
+        "view": {
+          "type": "string",
+          "description": "The view.",
+          "enum": [
+            "three-quarter",
+            "front",
+            "side",
+            "back"
+          ]
+        }
+      },
+      "required": [
+        "view"
+      ]
+    },
+    {
+      "id": "rotate",
+      "summary": "Turn the camera slowly around what is shown (an isolated structure, or the whole body), or stop.",
+      "details": "The turn stops by itself as soon as the person takes the camera. Refused while the body is coming apart (explode at 40% or more).",
+      "effect": "write",
+      "params": {
+        "on": {
+          "type": "boolean",
+          "description": "true turns (default), false stops."
+        },
+        "speed": {
+          "type": "string",
+          "description": "slow, normal (default) or fast.",
+          "enum": [
+            "slow",
+            "normal",
+            "fast"
+          ]
+        }
+      }
+    },
+    {
+      "id": "resetView",
+      "summary": "Reset the atlas: body assembled, default systems, nothing selected, camera back to the start (the Reset button).",
+      "effect": "write"
+    },
+    {
+      "id": "isolate",
+      "summary": "Isolate the selected structure (only it, the camera framing it) or show the anatomy around it again (the sheet's Isolate / Show surrounding button).",
+      "details": "Refused when nothing is selected (focus selects).",
+      "effect": "write",
+      "params": {
+        "on": {
+          "type": "boolean",
+          "description": "true (default) isolates, false shows the anatomy around it."
+        }
+      }
+    },
+    {
+      "id": "clearSelection",
+      "summary": "Deselect: nothing selected, the sheet closed (the sheet's Clear button).",
+      "effect": "write"
+    },
+    {
+      "id": "hideStructure",
+      "summary": "Hide a structure from the body (the sheet's Hide button): the one named, or the one selected.",
+      "details": "resetView brings every hidden piece back.",
+      "effect": "write",
+      "params": {
+        "structure": {
+          "type": "string",
+          "description": "The structure as said or its id; empty hides the selection.",
+          "maxLength": 120
+        }
+      }
+    },
+    {
+      "id": "showPlace",
+      "summary": "Show one region (head and neck, torso, abdomen, arm, pelvis, legs) or teaching area (orbit, larynx, heart, kidneys, hand, foot…) of the body, or the whole body again (the layers panel).",
+      "details": "Named as said (tête et cou, thorax, fosse du coude) or by id (head-neck, cubital); « corps entier » / whole body clears it. Areas the body has too few pieces in are not offered.",
+      "effect": "write",
+      "params": {
+        "place": {
+          "type": "string",
+          "description": "The region or area as said, or whole body.",
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "place"
+      ]
+    },
+    {
+      "id": "startTour",
+      "summary": "Start a guided visit, one structure at a time: heart, breathing, digestion, urinary tract, reproductive tract, trigeminal nerve, the fascial lines.",
+      "details": "Named as said (la visite du cœur, digestion). tourStep moves through it.",
+      "effect": "write",
+      "params": {
+        "tour": {
+          "type": "string",
+          "description": "The visit as said, or its id (heart, respiratory, digestive, urinary, reproductive, trigeminal, lineBack, lineFront, lineLateral, lineDeep).",
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "tour"
+      ]
+    },
+    {
+      "id": "heartbeat",
+      "summary": "Make the heart beat on screen, or stop it: a schematic rhythm at 72 per minute, the chambers contracting in order.",
+      "details": "Valves and vessels hold still. Shows only while the heart system is on screen; the heart visit turns it on by itself.",
+      "effect": "write",
+      "params": {
+        "on": {
+          "type": "boolean",
+          "description": "true beats (default), false stops."
+        }
+      }
+    },
+    {
+      "id": "tourStep",
+      "summary": "Move through the guided visit on screen: next, previous, first, last stop, or stop the visit.",
+      "effect": "write",
+      "params": {
+        "go": {
+          "type": "string",
+          "description": "next (default), previous, first, last or stop.",
+          "enum": [
+            "next",
+            "previous",
+            "first",
+            "last",
+            "stop"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reviewStart",
+      "summary": "Start a review (the quiz): opens it, isolates a structure without naming it and offers four names; the person answers by voice.",
+      "details": "scope is what to review, as said: systems (squelette, digestif), regions (tête et cou), organs (le cœur: its parts); several systems add up, a region or organ narrows them; none is the whole body. A scope with fewer than 4 structures in the reader's language is refused (TOO_SMALL). Returns the question number and the four choices, never the answer. A run already on is restarted. Waits (NOT_READY) while the review reads its schedule.",
+      "effect": "write",
+      "params": {
+        "scope": {
+          "type": "list",
+          "description": "What to review, as said; empty for the whole body.",
+          "maxItems": 8
+        },
+        "questions": {
+          "type": "number",
+          "description": "How many questions (default 10); 0 has no end.",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    {
+      "id": "reviewAnswer",
+      "summary": "Answer the review question on screen with what the person said (« c'est le foie », « the liver », « la deuxième »): says right or wrong and the right answer, as the option buttons do.",
+      "details": "The answer must be one of the four choices (in the app's language or in English); another name is refused with the choices (NO_OPTION). The answer is filed in the review schedule. Then reviewNext.",
+      "effect": "write",
+      "params": {
+        "answer": {
+          "type": "string",
+          "description": "The structure the person said, as said.",
+          "maxLength": 120
+        },
+        "option": {
+          "type": "number",
+          "description": "Or the choice by its place on screen, 1 to 4.",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    },
+    {
+      "id": "reviewNext",
+      "summary": "Ask the next review question (the Next button), once this one is answered.",
+      "effect": "write"
+    },
+    {
+      "id": "reviewSkip",
+      "summary": "Pass the review question (« je ne sais pas », « passe »): says what it was and asks the next one; nothing is graded.",
+      "effect": "write"
+    },
+    {
+      "id": "reviewRepeat",
+      "summary": "Repeat the review question: the structure isolated and framed again, the four choices said again.",
+      "effect": "write"
+    },
+    {
+      "id": "reviewScope",
+      "summary": "Change what the running review asks, from the next question on (« que le squelette maintenant »); the count and the streak go on.",
+      "details": "scope as in reviewStart.",
+      "effect": "write",
+      "params": {
+        "scope": {
+          "type": "list",
+          "description": "What to review, as said; empty for the whole body.",
+          "maxItems": 8
+        }
+      }
+    },
+    {
+      "id": "reviewStop",
+      "summary": "Stop the review: the run ends where it stands and its results are said (right, asked, accuracy, the missed ones); close true also closes the review and gives the body back.",
+      "effect": "write",
+      "params": {
+        "close": {
+          "type": "boolean",
+          "description": "true closes the review panel too."
+        }
+      }
+    },
+    {
+      "id": "reviewState",
+      "summary": "Say where the review is: closed, choosing, a question open (number, the four choices, never the answer while open), or the results.",
+      "effect": "read"
+    },
+    {
+      "id": "screen",
+      "summary": "Say what is on screen now: the body, the selected structure, isolated or not, explode, view, region, a tour, the review (question true: the person is answering), and each system with its pieces and whether it is shown.",
+      "details": "loaded is false while the body is loading. During a review question the selected structure is not named (it is the question).",
+      "effect": "read"
+    }
+  ],
+  "voiceCommands": {
+    "fr": [
+      "montre le cœur",
+      "fais battre le cœur",
+      "fais tourner le corps",
+      "affiche le squelette",
+      "éclate le corps à 40 %",
+      "montre-moi l’abdomen",
+      "révise-moi le système digestif, dix questions",
+      "c’est le foie",
+      "question suivante",
+      "répète la question",
+      "arrête la révision"
+    ],
+    "en": [
+      "show the heart",
+      "make the heart beat",
+      "turn the body",
+      "show the skeleton",
+      "explode the body to 40 percent",
+      "show me the abdomen",
+      "quiz me on the digestive system, ten questions",
+      "it is the liver",
+      "next question",
+      "repeat the question",
+      "stop the review"
+    ],
+    "es": [
+      "muestra el corazón",
+      "haz latir el corazón",
+      "gira el cuerpo",
+      "muestra el esqueleto",
+      "separa el cuerpo al 40 %",
+      "muéstrame el abdomen",
+      "repásame el sistema digestivo, diez preguntas",
+      "es el hígado",
+      "siguiente pregunta",
+      "repite la pregunta",
+      "para el repaso"
+    ]
+  },
+  "voiceVocabulary": {
+    "fr": [
+      "squelette",
+      "muscles",
+      "cœur",
+      "organes sensoriels",
+      "artères",
+      "veines",
+      "système nerveux",
+      "système sanguin",
+      "système digestif",
+      "système respiratoire",
+      "système urinaire",
+      "système lymphatique",
+      "système endocrinien",
+      "appareil reproducteur",
+      "respiratoire",
+      "digestif",
+      "urinaire",
+      "lymphatique",
+      "endocrinien",
+      "reproducteur",
+      "tissu conjonctif",
+      "surface du corps",
+      "poumons",
+      "cerveau",
+      "estomac",
+      "intestin",
+      "reins",
+      "abdomen",
+      "thorax",
+      "bassin",
+      "crâne",
+      "colonne vertébrale",
+      "vue éclatée",
+      "plein écran",
+      "trois quarts",
+      "de profil",
+      "révision"
+    ],
+    "en": [
+      "skeleton",
+      "muscles",
+      "heart",
+      "sensory organs",
+      "arteries",
+      "veins",
+      "nervous system",
+      "circulatory system",
+      "digestive system",
+      "respiratory system",
+      "urinary system",
+      "lymphatic system",
+      "endocrine system",
+      "reproductive system",
+      "respiratory",
+      "digestive",
+      "urinary",
+      "lymphatic",
+      "endocrine",
+      "reproductive",
+      "connective tissue",
+      "body surface",
+      "lungs",
+      "brain",
+      "stomach",
+      "intestine",
+      "kidneys",
+      "liver",
+      "abdomen",
+      "thorax",
+      "pelvis",
+      "skull",
+      "spine",
+      "exploded view",
+      "full screen",
+      "three-quarter",
+      "side view"
+    ],
+    "es": [
+      "esqueleto",
+      "músculos",
+      "corazón",
+      "órganos sensoriales",
+      "arterias",
+      "venas",
+      "sistema nervioso",
+      "sistema circulatorio",
+      "sistema digestivo",
+      "sistema respiratorio",
+      "sistema urinario",
+      "sistema linfático",
+      "sistema endocrino",
+      "aparato reproductor",
+      "respiratorio",
+      "digestivo",
+      "urinario",
+      "linfático",
+      "endocrino",
+      "reproductor",
+      "tejido conectivo",
+      "superficie del cuerpo",
+      "pulmones",
+      "cerebro",
+      "estómago",
+      "intestino",
+      "riñones",
+      "hígado",
+      "abdomen",
+      "tórax",
+      "pelvis",
+      "cráneo",
+      "columna vertebral",
+      "vista explotada",
+      "pantalla completa",
+      "tres cuartos",
+      "de perfil"
+    ]
+  }
 }

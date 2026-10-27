@@ -36,6 +36,8 @@ export const MIN_FOR_QUIZ = 4;
 
 /** The id of the tile that covers the whole body. */
 export const ALL_LEVEL = '__all__';
+/** The neutral tile colour of a level that is not one system (whole body, a region, an organ). */
+export const ALL_COLOR = '#7d8a97';
 
 export interface Level {
   id: string;
@@ -45,6 +47,13 @@ export interface Level {
   systems: SystemId[];
   /** Structures askable in it — the same number the quiz will draw from. */
   total: number;
+  /**
+   * A scope said aloud (a region, an organ): only these concept ids, within
+   * the systems. Absent for the tiles, which draw on whole systems.
+   */
+  only?: string[];
+  /** The scope's name as it was resolved, in the reader's language (a tile is named from its id). */
+  label?: string;
 }
 
 export interface LevelProgress {
@@ -102,7 +111,7 @@ export function levelsOf(atlas: Atlas): Level[] {
   const all: Level = {
     id: ALL_LEVEL,
     name: '',   // named by the panel: `level.all` in the strings table
-    color: '#7d8a97',
+    color: ALL_COLOR,
     systems: present.map((s) => s.id),
     total: askablePool(atlas, present.map((s) => s.id)).length,
   };

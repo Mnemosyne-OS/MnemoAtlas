@@ -58,6 +58,8 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 
 **Guided visits.** The path icon at the top right opens the visits. Five follow an organ: the heart, breathing, digestion, the urinary tract and the reproductive tract. A visit walks through an organ stop by stop. Each stop is shown on its own, framed and explained, with Previous and Next in the detail panel. « Show surrounding anatomy » brings the rest of the organ back around it. The heart visit follows the blood through the four chambers and the four valves. The same visit adapts to the female body and skips the stops it lacks. A sixth visit follows the trigeminal nerve and its three branches, with the zone of the face each one serves. Four more follow fascial lines, after the model of muscle chains proposed by Thomas Myers, which anatomists still debate. A line lights its muscles station by station, then all at once, and names the links this atlas lacks.
 
+**A heart that beats.** The pulse icon beside the rotate button makes the heart beat, and the heart visit turns it on by itself. It is a schematic drawn in code, at 72 per minute: the atria contract, then the ventricles, and the atria refill while the ventricles squeeze. Each chamber mesh is scaled about its own centre, in the same shader pass that lays the body apart, so a heart pulled out of the exploded body beats where it lies. The valves do not open or close, the vessels do not pulse, and the amplitudes are chosen to be visible, not measured on anyone. The button's tooltip and the credits panel say so. No dataset was added: no open-licence source carries a beating heart, and the two reference bodies are stills.
+
 **Hide one structure.** Select a structure and press « Hide this structure » to clear the view around what you are studying. The systems panel offers to bring hidden structures back.
 
 **Dark or light, like the app.** The atlas follows the theme of Mnemosyne OS, the 3D stage included.
@@ -71,6 +73,19 @@ The four counters are the level's own state, and a streak nobody has set yet ren
 **Seven interface languages, and structure names in French and Spanish.** The names come from Wikidata and are **not reviewed by anatomists**. The app says so in a notice you dismiss once per language, names English as the reference, and tells you how many structures that language covers. The 54 nerves have names written by hand. A female structure borrows the name of the male structure that has exactly the same English name. A question never mixes two languages: the quiz only asks about structures that have a name in the language you are working in.
 
 ## Changes
+
+**0.2.9**
+- The heart beats: a schematic rhythm at 72 per minute, behind a button and during the heart visit. An agent can start and stop it (`heartbeat`).
+- An isolated organ keeps its colours; the highlight is for finding a piece among others.
+- The view buttons and the 3D tooltip speak your language. A names file that does not arrive no longer empties the review in that language: the names stay English and the review goes on.
+
+**0.2.8**
+- An agent drives the body (structures, focus, systems, body, explode, view, rotate, regions, visits, and the review by voice), each through the same control a person presses. Writes are refused while a review question is open.
+- The body turns at a speed you set, behind its own icon. Showing a system starts the turn; taking the camera stops it for good.
+- The review speaks through the assistant: the question, its four choices, the verdict and the score, in your language.
+
+**0.2.7**
+- The review panel follows the host's language and theme.
 
 **0.2.6**
 - Your review progress comes back after you close the Atlas. It was saved, but read back from the wrong place.
