@@ -1,7 +1,8 @@
 {
   "name": "@mnemosyne-plugins/mnemo-atlas",
   "displayName": "Atlas",
-  "version": "0.2.9",
+  "version": "0.2.10",
+  "icon": "public/favicon.svg",
   "category": "Research",
   "vendor": "Mnemosyne Labs",
   "license": "MIT",

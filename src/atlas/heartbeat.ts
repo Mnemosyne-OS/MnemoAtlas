@@ -17,11 +17,13 @@
  * two real bodies.
  */
 
+/** A resting adult rate, in the middle of the usual range: a rhythm one can watch, not a measurement of anyone. */
 export const BEATS_PER_MINUTE = 72;
 
 export type Chamber = 'atrium' | 'ventricle';
 /** A cavity is the blood pool inside a wall (the male body ships both as separate meshes). */
 export type Tissue = 'wall' | 'cavity';
+/** What a chamber mesh is, for the beat: which chamber it belongs to, and whether it is the wall or the blood pool inside it. */
 export interface HeartRole {chamber: Chamber; tissue: Tissue}
 
 /** The part of the mesh name that marks a vessel, a valve or a cusp: those hold still. */
@@ -73,7 +75,7 @@ export const CONTRACTION: Record<Chamber, Record<Tissue, number>> = {
 /** The atria swell a little while the ventricles squeeze: they are filling. */
 export const ATRIAL_FILLING = 0.02;
 
-/** The atria contract in the first fifth of the cycle, the ventricles in the second and third. */
+/** The atria contract in the first fifth of the cycle; the ventricles start at 0.14, while the atria are still relaxing, and peak in the second fifth. */
 export const ATRIAL_SYSTOLE = {from: 0, peak: 0.07, to: 0.18} as const;
 export const VENTRICULAR_SYSTOLE = {from: 0.14, peak: 0.34, to: 0.58} as const;
 const FILLING = {from: 0.22, peak: 0.45, to: 0.7} as const;
